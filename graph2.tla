@@ -2,7 +2,7 @@
 EXTENDS FiniteSets, Sequences, Integers
 CONSTANTS Nodes, Succs
 ASSUME Succs \in [Nodes -> SUBSET Nodes]
-VARIABLE fun_stack, t_stack, num, col, sccs
+VARIABLE fun_stack, t_stack, num, lowpt, col, sccs
 RECURSIVE Path(_,_,_)
 
 Edge(v, w) == w \in Succs[v]
@@ -53,12 +53,13 @@ Next == \/ dfs
 TypeOK == /\ fun_stack \in Seq(Nodes \union SUBSET Nodes)
         /\ t_stack \in Seq(Nodes)
         /\ num \in [Nodes -> Nat \union {-1}]
+        /\ lowpt \in [Nodes -> Nat \union {-1}]
         /\ col \in [Nodes -> {"white", "gray", "black"}]
         /\ sccs \in SUBSET(SUBSET Nodes)
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Jan 30 16:44:50 CET 2020 by ipseiz5u
+\* Last modified Thu Jan 30 17:20:29 CET 2020 by ipseiz5u
 \* Last modified Thu Jan 30 14:12:11 CET 2020 by ipseiz5u
 \* Last modified Sun Jan 26 13:52:03 CET 2020 by matth_000
 \* Created Sun Jan 26 13:27:52 CET 2020 by matth_000
