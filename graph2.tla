@@ -2,7 +2,7 @@
 EXTENDS FiniteSets, Sequences, Integers
 CONSTANTS Nodes, Succs
 ASSUME Succs \in [Nodes -> SUBSET Nodes]
-VARIABLE fun_stack, t_stack, num, lowpt, col, sccs
+VARIABLE fun_stack, t_stack, num, lowlink, col, i,sccs
 RECURSIVE Path(_,_,_)
 
 Edge(v, w) == w \in Succs[v]
@@ -27,23 +27,33 @@ dfs == /\ fun_stack /= <<>>
                   \/ \E v \in S : LET t == S \ {v}
                                     IN /\ fun_stack' = <<v, t>> \o Tail(fun_stack)
                 
-dfs1 == \/ /\ fun_stack /= <<>>
+dfs1 == \/ /\ fun_stack /= <<>> 
            /\ LET v == Head(fun_stack)
                 IN /\ v \in Nodes
-                \* Vérifier qu'il n'est pas encore traité (couleur -> blanc) 
-                   \* Si en cours de traitement (gris) -> un scc
-                   /\ t_stack' = <<v>> \o t_stack  \* t devient en cours de traitement (gris)
-                   /\ LET S == {w \in Nodes : Edge(v,w)} 
-                        IN \/ S = {} /\ t_stack' = Tail(t_stack) \* Traitement -> noir
-                           \/ fun_stack' = <<S>> \o Tail(fun_stack)
-                   
-       \/ /\ LET v == Head(t_stack)
+                    \* Vérifier qu'il n'est pas encore traité (couleur -> blanc) 
+                   /\ IF col[v] = "white" 
+                      THEN  /\ t_stack' = <<v>> \o t_stack 
+                             \* v devient en cours de traitement (gris)
+                            /\ col'= [col EXCEPT ![v] = "gray"]
+                            /\ num' = [num EXCEPT ![v] = i]
+                            /\ lowlink' = [lowlink EXCEPT ![v] = num[v]]
+                            /\ i' = i + 1
+                            /\ LET S == {w \in Nodes : Edge(v,w)} 
+                                IN \/ S = {} /\ t_stack' = Tail(t_stack) 
+                                   \/ fun_stack' = <<S>> \o Tail(fun_stack)                   
+                      ELSE fun_stack' = fun_stack
+       \/  LET v == Head(t_stack)
                 IN \* Traitement -> noir
+                    /\ col' = [col EXCEPT ![v] = "black"]
                     /\ t_stack' = Tail(t_stack)
                    
           
 Init == /\ sccs = {}
         /\ fun_stack = <<Nodes>>
+        /\ num = [n \in Nodes |-> -1]
+        /\ lowlink = [n \in Nodes |-> -1] 
+        /\ col = [n \in Nodes |-> "white"]
+        /\ i = 0
        
         
 Next == \/ dfs
@@ -51,15 +61,15 @@ Next == \/ dfs
 
                                     
 TypeOK == /\ fun_stack \in Seq(Nodes \union SUBSET Nodes)
-        /\ t_stack \in Seq(Nodes)
-        /\ num \in [Nodes -> Nat \union {-1}]
-        /\ lowpt \in [Nodes -> Nat \union {-1}]
-        /\ col \in [Nodes -> {"white", "gray", "black"}]
-        /\ sccs \in SUBSET(SUBSET Nodes)
+          /\ t_stack \in Seq(Nodes)
+          /\ num \in [Nodes -> Nat \union {-1}]
+          /\ lowlink \in [Nodes -> Nat \union {-1}]
+          /\ col \in [Nodes -> {"white", "gray", "black"}]
+          /\ sccs \in SUBSET(SUBSET Nodes)
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Jan 30 17:20:29 CET 2020 by ipseiz5u
+\* Last modified Thu Feb 06 09:48:41 CET 2020 by ipseiz5u
 \* Last modified Thu Jan 30 14:12:11 CET 2020 by ipseiz5u
 \* Last modified Sun Jan 26 13:52:03 CET 2020 by matth_000
 \* Created Sun Jan 26 13:27:52 CET 2020 by matth_000
