@@ -5,6 +5,8 @@ ASSUME Succs \in [Nodes -> SUBSET Nodes]
 VARIABLE fun_stack, t_stack, num, lowlink, col, i,sccs
 RECURSIVE Path(_,_,_)
 
+INFTY == Cardinality(Nodes)+1
+
 Edge(v, w) == w \in Succs[v]
 
 Path(x, y, n) == IF n = 0 THEN x = y
@@ -26,7 +28,8 @@ dfs == /\ fun_stack /= <<>>
                /\ \/ S = {} /\ fun_stack' = Tail(fun_stack)
                   \/ \E v \in S : LET t == S \ {v}
                                     IN /\ fun_stack' = <<v, t>> \o Tail(fun_stack)
-                
+
+(**                
 dfs1 == \/ /\ fun_stack /= <<>> 
            /\ LET v == Head(fun_stack)
                 IN /\ v \in Nodes
@@ -46,7 +49,33 @@ dfs1 == \/ /\ fun_stack /= <<>>
                 IN \* Traitement -> noir
                     /\ col' = [col EXCEPT ![v] = "black"]
                     /\ t_stack' = Tail(t_stack)
-                   
+**)
+
+dfs1 ==
+  /\ LET r == Head(fun_stack)
+         newr == [r EXCEPT !.kind = "dfs1b"]
+     IN  /\ r.kind = "dfs1"
+         /\ fun_stack' = <<[kind |-> "dfs", arg |-> Succs[r.arg], res |-> -1],
+                            newr>>
+                          \o Tail(fun_stack)
+         /\ t_stack' = <<r.arg>> \o t_stack
+         /\ i' = i+1
+         /\ num' = [num EXCEPT ![r.arg] = i]
+         /\ UNCHANGED <<col, sccs>>
+
+dfs1b ==
+  /\ LET r == Head(fun_stack)
+         below == Head(Tail(fun_stack))
+     IN  /\ r.kind = "dfs1b"
+         /\ IF r.res < num[r.arg]
+            THEN /\ fun_stack' = <<[below EXCEPT !.res = r.res]>> \o Tail(Tail(fun_stack))
+                 /\ UNCHANGED <<t_stack,i,num,col,sccs>>
+            ELSE LET n == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = r.arg
+                     scc == {t_stack[k] : k \in 1 .. n}
+                 IN  /\ t_stack' = SubSeq(t_stack, n+1, Len(t_stack))
+                     /\ sccs' = sccs \cup {scc}
+                     /\ num' = [x \in Nodes |-> IF x \in scc THEN INFTY ELSE num[x]]
+                     /\ fun_stack' = <<[below EXCEPT !.res = INFTY]>> \o Tail(Tail(fun_stack))
           
 Init == /\ sccs = {}
         /\ fun_stack = <<Nodes>>
@@ -69,6 +98,7 @@ TypeOK == /\ fun_stack \in Seq(Nodes \union SUBSET Nodes)
 
 =============================================================================
 \* Modification History
+\* Last modified Thu Feb 06 16:14:07 CET 2020 by merz
 \* Last modified Thu Feb 06 09:48:41 CET 2020 by ipseiz5u
 \* Last modified Thu Jan 30 14:12:11 CET 2020 by ipseiz5u
 \* Last modified Sun Jan 26 13:52:03 CET 2020 by matth_000
