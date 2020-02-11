@@ -24,10 +24,26 @@ SCC(S) == /\ AllConnected(S)
                                      
 dfs == /\ fun_stack /= <<>>
        /\ LET S == Head(fun_stack)
-            IN /\ S \in SUBSET Nodes
-               /\ \/ S = {} /\ fun_stack' = Tail(fun_stack)
-                  \/ \E v \in S : LET t == S \ {v}
-                                    IN /\ fun_stack' = <<v, t>> \o Tail(fun_stack)
+            IN /\ S.kind = "dfs"
+               /\ S.arg \in SUBSET Nodes
+               /\ \/ S.arg = {} /\ fun_stack' = Tail(fun_stack)
+                  \/ \E x \in S.arg : LET t == S.arg \ {x}
+                                    IN IF num[x] /= -1
+                                        THEN  LET r == [kind |-> "dfs1b", arg |-> t, res |-> num[x]]
+                                              IN fun_stack' = <<r, t>> \o Tail(fun_stack)                                         
+                                        ELSE
+                                              LET r == [kind |-> "dfs1", arg |-> x, res |-> num[x]]
+                                              IN fun_stack' = <<r, t>> \o Tail(fun_stack)
+
+(**dfsb == /\ LET S == Head(fun_stack)
+           IN  /\ S.kind == "dfsb"
+               /\ n1 == S.res
+               /\ LET t == S.arg
+                   IN /\ r == [kind |-> "dfs", arg, res] 
+                   
+**)                    
+        
+        
 
 (**                
 dfs1 == \/ /\ fun_stack /= <<>> 
@@ -78,7 +94,7 @@ dfs1b ==
                      /\ fun_stack' = <<[below EXCEPT !.res = INFTY]>> \o Tail(Tail(fun_stack))
           
 Init == /\ sccs = {}
-        /\ fun_stack = <<Nodes>>
+        /\ fun_stack = [kind |-> "dfs", arg |-> <<Nodes>>, res |-> -1]
         /\ num = [n \in Nodes |-> -1]
         /\ lowlink = [n \in Nodes |-> -1] 
         /\ col = [n \in Nodes |-> "white"]
@@ -98,6 +114,8 @@ TypeOK == /\ fun_stack \in Seq(Nodes \union SUBSET Nodes)
 
 =============================================================================
 \* Modification History
+\* Last modified Tue Feb 11 18:33:12 CET 2020 by nicola116u
+\* Last modified Tue Feb 11 18:21:02 CET 2020 by nicola116u
 \* Last modified Thu Feb 06 16:14:07 CET 2020 by merz
 \* Last modified Thu Feb 06 09:48:41 CET 2020 by ipseiz5u
 \* Last modified Thu Jan 30 14:12:11 CET 2020 by ipseiz5u
