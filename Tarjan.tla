@@ -1,5 +1,5 @@
 ------------------------------- MODULE Tarjan -------------------------------
-EXTENDS FiniteSets, Sequences, Integers, SCC
+EXTENDS FiniteSets, Sequences, Integers, SCC, TLAPS
 
 (***************************************************************************)
 (* The algorithm in pseudo-code (from Wikipedia):                          *)
@@ -66,7 +66,7 @@ EXTENDS FiniteSets, Sequences, Integers, SCC
     toVisit = Nodes;
 
   procedure visit(v) 
-    variable succs, w; 
+    variable succs = {}, w; 
   {
 start_visit:
     num[v] := index;
@@ -112,7 +112,7 @@ main:
   }
 }
 *)
-\* BEGIN TRANSLATION PCal-1c130795fb3a667de4cc07aa7095f6e0
+\* BEGIN TRANSLATION PCal-8c68717fa50233a5e0a592e1e248e9de
 CONSTANT defaultInitValue
 VARIABLES index, t_stack, num, lowlink, onStack, sccs, toVisit, pc, stack, v, 
           succs, w
@@ -130,7 +130,7 @@ Init == (* Global variables *)
         /\ toVisit = Nodes
         (* Procedure visit *)
         /\ v = defaultInitValue
-        /\ succs = defaultInitValue
+        /\ succs = {}
         /\ w = defaultInitValue
         /\ stack = << >>
         /\ pc = "main"
@@ -174,7 +174,7 @@ visit_recurse == /\ pc = "visit_recurse"
                                      v         |->  v ] >>
                                  \o stack
                     /\ v' = w
-                 /\ succs' = defaultInitValue
+                 /\ succs' = {}
                  /\ w' = defaultInitValue
                  /\ pc' = "start_visit"
                  /\ UNCHANGED << index, t_stack, num, lowlink, onStack, sccs, 
@@ -220,7 +220,7 @@ main == /\ pc = "main"
                                                        v         |->  v ] >>
                                                    \o stack
                                       /\ v' = n
-                                   /\ succs' = defaultInitValue
+                                   /\ succs' = {}
                                    /\ w' = defaultInitValue
                                    /\ pc' = "start_visit"
                               ELSE /\ pc' = "main"
@@ -239,11 +239,65 @@ Spec == Init /\ [][Next]_vars
 
 Termination == <>(pc = "Done")
 
-\* END TRANSLATION TLA-4824c568ebcdda4689e9f5c995f8b0e3
+\* END TRANSLATION TLA-8befcf14470ef67dababcf2fab7ead25
 
+Correct == pc = "Done" => sccs = SCCs
 
+StackEntry == [
+   procedure : {"visit"},
+   pc : {"continue_visit", "main"},
+   succs : SUBSET Nodes,
+   w : Nodes \cup {defaultInitValue},
+   v : Nodes \cup {defaultInitValue}
+]
+
+TypeOK ==
+  /\ index \in Nat
+  /\ t_stack \in Seq(Nodes)
+  /\ num \in [Nodes -> Nat \cup {-1}]
+  /\ lowlink \in [Nodes -> Nat \cup {-1}]
+  /\ onStack \in [Nodes -> BOOLEAN]
+  /\ sccs \in SUBSET SUBSET Nodes
+  /\ toVisit \in SUBSET Nodes
+  /\ pc \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
+  /\ stack \in Seq(StackEntry)
+  /\ succs \in SUBSET Nodes
+  /\ v \in Nodes \cup {defaultInitValue}
+  /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
+  /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => w \in Nodes 
+  /\ w \in Nodes \cup {defaultInitValue}
+
+USE SuccsType
+
+THEOREM Spec => []TypeOK
+<1>init. Init => TypeOK
+  BY DEF Init, TypeOK
+<1>next. TypeOK /\ [Next]_vars => TypeOK'
+  <2> SUFFICES ASSUME TypeOK,
+                      [Next]_vars
+               PROVE  TypeOK'
+    OBVIOUS
+  <2>. USE DEF TypeOK
+  <2>1. CASE start_visit
+    BY <2>1 DEF start_visit
+  <2>2. CASE explore_succ
+    BY <2>2 DEF vars, explore_succ
+  <2>3. CASE visit_recurse
+  <2>4. CASE continue_visit
+    BY <2>4 DEF vars, continue_visit
+  <2>5. CASE check_root
+  <2>6. CASE main
+  <2>7. CASE Terminating
+    BY <2>7 DEF vars, Terminating
+  <2>8. CASE UNCHANGED vars
+    BY <2>8 DEF vars
+  <2>9. QED
+    BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
+<1>. QED  BY <1>init, <1>next, PTL DEF Spec
 
 =============================================================================
 \* Modification History
-\* Last modified Thu Feb 20 18:37:24 CET 2020 by merz
+\* Last modified Tue Mar 03 20:28:45 CET 2020 by Angela Ipseiz
+\* Last modified Tue Mar 03 11:04:54 CET 2020 by Angela Ipseiz
+\* Last modified Thu Feb 27 16:24:13 CET 2020 by merz
 \* Created Thu Feb 20 14:43:38 CET 2020 by merz
