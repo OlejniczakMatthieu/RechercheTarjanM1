@@ -264,7 +264,7 @@ TypeOK ==
   /\ succs \in SUBSET Nodes
   /\ v \in Nodes \cup {defaultInitValue}
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
-  /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => w \in Nodes 
+  /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w \in Nodes 
   /\ w \in Nodes \cup {defaultInitValue}
 
 USE SuccsType
@@ -283,10 +283,75 @@ THEOREM Spec => []TypeOK
   <2>2. CASE explore_succ
     BY <2>2 DEF vars, explore_succ
   <2>3. CASE visit_recurse
+    BY <2>3 DEF StackEntry, visit_recurse
   <2>4. CASE continue_visit
     BY <2>4 DEF vars, continue_visit
   <2>5. CASE check_root
+        <3>1. index' \in Nat
+            BY <2>5 DEF check_root
+        <3>2. t_stack' \in Seq(Nodes) 
+            BY <2>5 DEF vars, check_root          
+        <3>3. num' \in [Nodes -> Nat \cup {-1}]  
+            BY <2>5 DEF check_root        
+        <3>4. lowlink' \in [Nodes -> Nat \cup {-1}]  
+            BY <2>5 DEF check_root         
+        <3>5. onStack' \in [Nodes -> BOOLEAN] 
+            BY <2>5 DEF check_root         
+        <3>6. sccs' \in SUBSET SUBSET Nodes  
+            BY <2>5 DEF check_root         
+        <3>7. toVisit' \in SUBSET Nodes  
+            BY <2>5 DEF check_root        
+        <3>8. pc' \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
+            BY <2>5 DEF check_root          
+        <3>9. stack' \in Seq(StackEntry)   
+           BY <2>5 DEF StackEntry, check_root
+        <3>10. succs' \in SUBSET Nodes 
+           BY <2>5 DEF check_root
+        <3>11. v' \in Nodes \cup {defaultInitValue}   
+            BY <2>5 DEF check_root        
+        <3>12. pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v' \in Nodes   
+            BY <2>5 DEF check_root        
+        <3>13. pc' \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w' \in Nodes   
+            BY <2>5 DEF check_root        
+        <3>14. w' \in Nodes \cup {defaultInitValue}
+            BY <2>5 DEF check_root
+           
+        <3>15. QED
+            BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14 DEF check_root
+  
   <2>6. CASE main
+    <3>1. index' \in Nat
+        BY <2>6 DEF main
+    <3>2. t_stack' \in Seq(Nodes) 
+        BY <2>6 DEF main          
+    <3>3. num' \in [Nodes -> Nat \cup {-1}]  
+        BY <2>6 DEF main        
+    <3>4. lowlink' \in [Nodes -> Nat \cup {-1}]  
+        BY <2>6 DEF main         
+    <3>5. onStack' \in [Nodes -> BOOLEAN] 
+        BY <2>6 DEF main         
+    <3>6. sccs' \in SUBSET SUBSET Nodes  
+        BY <2>6 DEF main         
+    <3>7. toVisit' \in SUBSET Nodes  
+        BY <2>6 DEF main        
+    <3>8. pc' \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
+        BY <2>6 DEF main          
+    <3>9. stack' \in Seq(StackEntry)   
+        BY <2>6 DEF StackEntry, main
+    <3>10. succs' \in SUBSET Nodes 
+        BY <2>6 DEF main
+    <3>11. v' \in Nodes \cup {defaultInitValue}   
+       BY <2>6 DEF main        
+    <3>12. pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v' \in Nodes   
+         BY <2>6 DEF main        
+    <3>13. pc' \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w' \in Nodes   
+         BY <2>6 DEF main        
+    <3>14. w' \in Nodes \cup {defaultInitValue}
+        BY <2>6 DEF main
+       
+    <3>15. QED
+        BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14 DEF main
+  
   <2>7. CASE Terminating
     BY <2>7 DEF vars, Terminating
   <2>8. CASE UNCHANGED vars
@@ -297,7 +362,7 @@ THEOREM Spec => []TypeOK
 
 =============================================================================
 \* Modification History
-\* Last modified Tue Mar 03 20:28:45 CET 2020 by Angela Ipseiz
+\* Last modified Thu Mar 05 12:10:08 CET 2020 by Angela Ipseiz
 \* Last modified Tue Mar 03 11:04:54 CET 2020 by Angela Ipseiz
 \* Last modified Thu Feb 27 16:24:13 CET 2020 by merz
 \* Created Thu Feb 20 14:43:38 CET 2020 by merz
