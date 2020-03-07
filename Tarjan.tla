@@ -89,7 +89,7 @@ continue_visit:
       }
     };
 check_root:
-    if (lowlink[v] = num[v]) {
+    if (lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v)) {
       \* new SCC found: pop all nodes up to v from the (Tarjan) stack
       with (k = CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v) {
         sccs := sccs \cup {{t_stack[i] : i \in 1 .. k}};
@@ -112,7 +112,7 @@ main:
   }
 }
 *)
-\* BEGIN TRANSLATION PCal-8c68717fa50233a5e0a592e1e248e9de
+\* BEGIN TRANSLATION PCal-0b7e38f16f0a4b3ff74373336ba37ec3
 CONSTANT defaultInitValue
 VARIABLES index, t_stack, num, lowlink, onStack, sccs, toVisit, pc, stack, v, 
           succs, w
@@ -190,7 +190,7 @@ continue_visit == /\ pc = "continue_visit"
                                   stack, v, succs, w >>
 
 check_root == /\ pc = "check_root"
-              /\ IF lowlink[v] = num[v]
+              /\ IF lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
                     THEN /\ LET k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v IN
                               /\ sccs' = (sccs \cup {{t_stack[i] : i \in 1 .. k}})
                               /\ onStack' = [n \in Nodes |-> IF \E i \in 1 .. k : n = t_stack[i] THEN FALSE
@@ -239,7 +239,7 @@ Spec == Init /\ [][Next]_vars
 
 Termination == <>(pc = "Done")
 
-\* END TRANSLATION TLA-8befcf14470ef67dababcf2fab7ead25
+\* END TRANSLATION TLA-ca633d7928a0211fc004f869a2523ede
 
 Correct == pc = "Done" => sccs = SCCs
 
@@ -261,6 +261,14 @@ TypeOK ==
   /\ toVisit \in SUBSET Nodes
   /\ pc \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
   /\ stack \in Seq(StackEntry)
+  /\ \A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
+        /\ i < Len(stack)
+        /\ stack[i].v \in Nodes
+        /\ stack[i].w \in Nodes
+  /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
+     => /\ stack # << >> 
+        /\ Head(stack).pc = "continue_visit" => Head(stack).v \in Nodes 
+        /\ Head(stack).pc = "continue_visit" => Head(stack).w \in Nodes
   /\ succs \in SUBSET Nodes
   /\ v \in Nodes \cup {defaultInitValue}
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
@@ -290,7 +298,16 @@ THEOREM Spec => []TypeOK
         <3>1. index' \in Nat
             BY <2>5 DEF check_root
         <3>2. t_stack' \in Seq(Nodes) 
-            BY <2>5 DEF vars, check_root          
+          <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v
+            <5>1. t_stack' = SubSeq(t_stack,
+                                (CHOOSE k \in 1..Len(t_stack) :
+                                   t_stack[k] = v)
+                                + 1, Len(t_stack))
+              BY <2>5, <4>1 DEF check_root
+            <5>. QED  BY <5>1, <4>1
+          <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v)
+            BY <2>5, <4>2 DEF check_root
+          <4>. QED  BY <4>1, <4>2
         <3>3. num' \in [Nodes -> Nat \cup {-1}]  
             BY <2>5 DEF check_root        
         <3>4. lowlink' \in [Nodes -> Nat \cup {-1}]  
@@ -298,26 +315,41 @@ THEOREM Spec => []TypeOK
         <3>5. onStack' \in [Nodes -> BOOLEAN] 
             BY <2>5 DEF check_root         
         <3>6. sccs' \in SUBSET SUBSET Nodes  
-            BY <2>5 DEF check_root         
+          <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v
+            <5>1. sccs' = (sccs \cup {{t_stack[i] : i \in 1 .. (CHOOSE k \in 1..Len(t_stack) : t_stack[k] = v)}})
+              BY <2>5, <4>1, Zenon DEF check_root
+            <5>. QED  BY <5>1, <4>1
+          <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v)
+            BY <2>5, <4>2, Zenon DEF check_root
+          <4>. QED  BY <4>1, <4>2
         <3>7. toVisit' \in SUBSET Nodes  
             BY <2>5 DEF check_root        
-        <3>8. pc' \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
-            BY <2>5 DEF check_root          
-        <3>9. stack' \in Seq(StackEntry)   
-           BY <2>5 DEF StackEntry, check_root
-        <3>10. succs' \in SUBSET Nodes 
-           BY <2>5 DEF check_root
-        <3>11. v' \in Nodes \cup {defaultInitValue}   
-            BY <2>5 DEF check_root        
-        <3>12. pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v' \in Nodes   
-            BY <2>5 DEF check_root        
-        <3>13. pc' \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w' \in Nodes   
-            BY <2>5 DEF check_root        
-        <3>14. w' \in Nodes \cup {defaultInitValue}
+        <3>8. pc' \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
+          <4>1. Head(stack) \in StackEntry
             BY <2>5 DEF check_root
-           
+          <4>. QED  BY <4>1, <2>5 DEF StackEntry, check_root 
+        <3>9. stack' \in Seq(StackEntry)
+          <4>1. stack # << >>
+            BY <2>5 DEF check_root
+          <4>. QED  BY <2>5, <4>1 DEF StackEntry, check_root
+        <3>10. succs' \in SUBSET Nodes 
+          <4>1. Head(stack) \in StackEntry
+            BY <2>5 DEF check_root
+          <4>. QED  BY <4>1, <2>5 DEF StackEntry, check_root 
+        <3>11. /\ v' \in Nodes \cup {defaultInitValue}
+               /\ w' \in Nodes \cup {defaultInitValue}
+               /\ pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v' \in Nodes  
+               /\ pc' \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w' \in Nodes
+          <4>1. Head(stack) \in StackEntry
+            BY <2>5 DEF check_root
+          <4>. QED  BY <4>1, <2>5 DEF StackEntry, check_root 
+        <3>12. pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
+               => /\ stack' # << >> 
+                  /\ Head(stack').pc = "continue_visit" => Head(stack').v \in Nodes 
+                  /\ Head(stack').pc = "continue_visit" => Head(stack').w \in Nodes
+
         <3>15. QED
-            BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14 DEF check_root
+            BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12 DEF check_root
   
   <2>6. CASE main
     <3>1. index' \in Nat
@@ -362,7 +394,7 @@ THEOREM Spec => []TypeOK
 
 =============================================================================
 \* Modification History
+\* Last modified Fri Mar 06 17:25:09 CET 2020 by merz
 \* Last modified Thu Mar 05 12:10:08 CET 2020 by Angela Ipseiz
 \* Last modified Tue Mar 03 11:04:54 CET 2020 by Angela Ipseiz
-\* Last modified Thu Feb 27 16:24:13 CET 2020 by merz
 \* Created Thu Feb 20 14:43:38 CET 2020 by merz
