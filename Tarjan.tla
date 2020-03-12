@@ -277,7 +277,7 @@ TypeOK ==
 
 USE SuccsType
 
-THEOREM Spec => []TypeOK
+THEOREM TypeCorrect == Spec => []TypeOK
 <1>init. Init => TypeOK
   BY DEF Init, TypeOK
 <1>next. TypeOK /\ [Next]_vars => TypeOK'
@@ -446,7 +446,7 @@ THEOREM Spec => []TypeOK
 
 -----------------------------------------------------------------------------
 
-NumStack ==
+NumStackInv ==
   /\ index <= Cardinality(Nodes)
   /\ \A n \in Nodes : num[n] < Cardinality(Nodes)
   /\ \A n \in Nodes : onStack[n] <=> (num[n] \in Nat /\ \E i \in 1 .. Len(t_stack) : t_stack[i] = n)
@@ -454,9 +454,14 @@ NumStack ==
         /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
         /\ t_stack[i] = t_stack[j] => i = j
 
+THEOREM NumStack == Spec => []NumStackInv
+<1>1. Init => NumStackInv
+<1>2. TypeOK /\ NumStackInv /\ [Next]_vars => NumStackInv'
+<1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
+
 =============================================================================
 \* Modification History
-\* Last modified Thu Mar 12 16:34:22 CET 2020 by merz
+\* Last modified Thu Mar 12 16:54:29 CET 2020 by merz
 \* Last modified Thu Mar 12 15:17:22 CET 2020 by merz
 \* Last modified Thu Mar 12 14:13:39 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 12 10:56:53 CET 2020 by Angela Ipseiz
