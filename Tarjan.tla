@@ -272,7 +272,7 @@ TypeOK ==
   /\ succs \in SUBSET Nodes
   /\ v \in Nodes \cup {defaultInitValue}
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
-  /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w \in Nodes 
+  /\ pc \in {"visit_recurse", "continue_visit"} => w \in Nodes 
   /\ w \in Nodes \cup {defaultInitValue}
 
 USE SuccsType
@@ -289,11 +289,11 @@ THEOREM Spec => []TypeOK
   <2>1. CASE start_visit
     BY <2>1 DEF start_visit
   <2>2. CASE explore_succ
-    BY <2>2 DEF vars, explore_succ
+    BY <2>2 DEF explore_succ
   <2>3. CASE visit_recurse
     BY <2>3 DEF StackEntry, visit_recurse
   <2>4. CASE continue_visit
-    BY <2>4 DEF vars, continue_visit
+    BY <2>4 DEF continue_visit
   <2>5. CASE check_root
         <3>1. index' \in Nat
             BY <2>5 DEF check_root
@@ -304,7 +304,7 @@ THEOREM Spec => []TypeOK
                                    t_stack[k] = v)
                                 + 1, Len(t_stack))
               BY <2>5, <4>1 DEF check_root
-            <5>. QED  BY <5>1, <4>1
+            <5>. QED  BY  <5>1, <4>1 
           <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v)
             BY <2>5, <4>2 DEF check_root
           <4>. QED  BY <4>1, <4>2
@@ -344,10 +344,22 @@ THEOREM Spec => []TypeOK
             BY <2>5 DEF check_root
           <4>. QED  BY <4>1, <2>5 DEF StackEntry, check_root 
         <3>12. pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
-               => /\ stack' # << >> 
+               => /\ stack' # <<>> 
                   /\ Head(stack').pc = "continue_visit" => Head(stack').v \in Nodes 
                   /\ Head(stack').pc = "continue_visit" => Head(stack').w \in Nodes
-
+          <4> SUFFICES ASSUME pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
+                       PROVE  /\ stack' # << >> 
+                              /\ Head(stack').pc = "continue_visit" => Head(stack').v \in Nodes 
+                              /\ Head(stack').pc = "continue_visit" => Head(stack').w \in Nodes
+                OBVIOUS
+            <4>1. stack' # << >>
+                BY <2>5 DEF check_root
+            <4>2. Head(stack').pc = "continue_visit" => Head(stack').v \in Nodes
+                BY <2>5 DEF check_root
+            <4>3. Head(stack').pc = "continue_visit" => Head(stack').w \in Nodes
+                BY <2>5 DEF check_root
+            <4>4. QED
+                BY <4>1, <4>2, <4>3
         <3>15. QED
             BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12 DEF check_root
   
@@ -394,6 +406,8 @@ THEOREM Spec => []TypeOK
 
 =============================================================================
 \* Modification History
+\* Last modified Thu Mar 12 14:13:39 CET 2020 by Angela Ipseiz
+\* Last modified Thu Mar 12 10:56:53 CET 2020 by Angela Ipseiz
 \* Last modified Fri Mar 06 17:25:09 CET 2020 by merz
 \* Last modified Thu Mar 05 12:10:08 CET 2020 by Angela Ipseiz
 \* Last modified Tue Mar 03 11:04:54 CET 2020 by Angela Ipseiz
