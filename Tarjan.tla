@@ -1,5 +1,5 @@
 ------------------------------- MODULE Tarjan -------------------------------
-EXTENDS FiniteSets, Sequences, Integers, SCC, TLAPS
+EXTENDS FiniteSets, Sequences, Integers, SCC, TLAPS, FiniteSetTheorems
 
 (***************************************************************************)
 (* The algorithm in pseudo-code (from Wikipedia):                          *)
@@ -304,7 +304,9 @@ THEOREM Spec => []TypeOK
                                    t_stack[k] = v)
                                 + 1, Len(t_stack))
               BY <2>5, <4>1 DEF check_root
-            <5>. QED  BY  <5>1, <4>1 
+            <5>2. (CHOOSE k \in 1..Len(t_stack) : t_stack[k] = v) \in 1..Len(t_stack)
+              BY <4>1
+            <5>. QED  BY  <5>1, <5>2, <4>1
           <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v)
             BY <2>5, <4>2 DEF check_root
           <4>. QED  BY <4>1, <4>2
@@ -339,7 +341,7 @@ THEOREM Spec => []TypeOK
         <3>11. /\ v' \in Nodes \cup {defaultInitValue}
                /\ w' \in Nodes \cup {defaultInitValue}
                /\ pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v' \in Nodes  
-               /\ pc' \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w' \in Nodes
+               /\ pc' \in {"visit_recurse", "continue_visit"} => w' \in Nodes
           <4>1. Head(stack) \in StackEntry
             BY <2>5 DEF check_root
           <4>. QED  BY <4>1, <2>5 DEF StackEntry, check_root 
@@ -353,15 +355,30 @@ THEOREM Spec => []TypeOK
                               /\ Head(stack').pc = "continue_visit" => Head(stack').w \in Nodes
                 OBVIOUS
             <4>1. stack' # << >>
+              <5>1. stack # << >>
                 BY <2>5 DEF check_root
+              <5>2. Head(stack) \in StackEntry
+                BY <5>1
+              <5>3. Head(stack).pc = "continue_visit"
+                BY <2>5, <5>2 DEF check_root, StackEntry
+              <5>4. 1 < Len(stack)
+                BY <5>3, <5>1
+              <5>5. Len(stack') = Len(stack)-1
+                BY <2>5, <5>1 DEF check_root
+              <5>. QED  BY <2>5, <5>4, <5>5
             <4>2. Head(stack').pc = "continue_visit" => Head(stack').v \in Nodes
-                BY <2>5 DEF check_root
+                BY <2>5, <4>1 DEF check_root
             <4>3. Head(stack').pc = "continue_visit" => Head(stack').w \in Nodes
-                BY <2>5 DEF check_root
+                BY <2>5, <4>1 DEF check_root
             <4>4. QED
                 BY <4>1, <4>2, <4>3
+        <3>13. \A i \in 1 .. Len(stack') : stack'[i].pc = "continue_visit" =>
+                  /\ i < Len(stack')
+                  /\ stack'[i].v \in Nodes
+                  /\ stack'[i].w \in Nodes
+          BY <2>5 DEF check_root
         <3>15. QED
-            BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12 DEF check_root
+            BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13 DEF check_root
   
   <2>6. CASE main
     <3>1. index' \in Nat
@@ -380,21 +397,44 @@ THEOREM Spec => []TypeOK
         BY <2>6 DEF main        
     <3>8. pc' \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
         BY <2>6 DEF main          
-    <3>9. stack' \in Seq(StackEntry)   
-        BY <2>6 DEF StackEntry, main
+    <3>9. stack' \in Seq(StackEntry)  
+      <4>1. CASE stack' =  <<[procedure |-> "visit",
+                                            pc |-> "main", succs |-> succs,
+                                            w |-> w, v |-> v]>>
+                                         \o stack
+        BY <4>1 DEF StackEntry
+      <4>2. CASE UNCHANGED stack
+        BY <4>2
+      <4>. QED  BY <4>1, <4>2, <2>6 DEF main
     <3>10. succs' \in SUBSET Nodes 
         BY <2>6 DEF main
     <3>11. v' \in Nodes \cup {defaultInitValue}   
        BY <2>6 DEF main        
     <3>12. pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v' \in Nodes   
          BY <2>6 DEF main        
-    <3>13. pc' \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => w' \in Nodes   
+    <3>13. pc' \in {"visit_recurse", "continue_visit"} => w' \in Nodes   
          BY <2>6 DEF main        
     <3>14. w' \in Nodes \cup {defaultInitValue}
         BY <2>6 DEF main
-       
-    <3>15. QED
-        BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14 DEF main
+    <3>15. \A i \in 1 .. Len(stack') : stack'[i].pc = "continue_visit" =>
+              /\ i < Len(stack')
+              /\ stack'[i].v \in Nodes
+              /\ stack'[i].w \in Nodes
+      <4>1. CASE stack' =  <<[procedure |-> "visit",
+                                            pc |-> "main", succs |-> succs,
+                                            w |-> w, v |-> v]>>
+                                         \o stack
+        BY <4>1
+      <4>2. CASE UNCHANGED stack
+        BY <4>2
+      <4>. QED  BY <4>1, <4>2, <2>6 DEF main
+    <3>16. pc' \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => 
+             /\ stack' # << >> 
+             /\ Head(stack').pc = "continue_visit" => Head(stack').v \in Nodes 
+             /\ Head(stack').pc = "continue_visit" => Head(stack').w \in Nodes
+      BY <2>6 DEF main
+    <3>. QED
+        BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16 DEF main
   
   <2>7. CASE Terminating
     BY <2>7 DEF vars, Terminating
@@ -404,11 +444,22 @@ THEOREM Spec => []TypeOK
     BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
 <1>. QED  BY <1>init, <1>next, PTL DEF Spec
 
+-----------------------------------------------------------------------------
+
+NumStack ==
+  /\ index <= Cardinality(Nodes)
+  /\ \A n \in Nodes : num[n] < Cardinality(Nodes)
+  /\ \A n \in Nodes : onStack[n] <=> (num[n] \in Nat /\ \E i \in 1 .. Len(t_stack) : t_stack[i] = n)
+  /\ \A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
+        /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+        /\ t_stack[i] = t_stack[j] => i = j
+
 =============================================================================
 \* Modification History
+\* Last modified Thu Mar 12 16:34:22 CET 2020 by merz
+\* Last modified Thu Mar 12 15:17:22 CET 2020 by merz
 \* Last modified Thu Mar 12 14:13:39 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 12 10:56:53 CET 2020 by Angela Ipseiz
-\* Last modified Fri Mar 06 17:25:09 CET 2020 by merz
 \* Last modified Thu Mar 05 12:10:08 CET 2020 by Angela Ipseiz
 \* Last modified Tue Mar 03 11:04:54 CET 2020 by Angela Ipseiz
 \* Created Thu Feb 20 14:43:38 CET 2020 by merz
