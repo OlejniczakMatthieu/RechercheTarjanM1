@@ -276,6 +276,7 @@ TypeOK ==
   /\ w \in Nodes \cup {defaultInitValue}
 
 USE SuccsType
+USE IsFiniteSet(Nodes)
 
 THEOREM TypeCorrect == Spec => []TypeOK
 <1>init. Init => TypeOK
@@ -306,10 +307,10 @@ THEOREM TypeCorrect == Spec => []TypeOK
               BY <2>5, <4>1 DEF check_root
             <5>2. (CHOOSE k \in 1..Len(t_stack) : t_stack[k] = v) \in 1..Len(t_stack)
               BY <4>1
-            <5>. QED  BY  <5>1, <5>2, <4>1
-          <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v)
+            <5>. QED  BY  <5>1, <5>2, <4>1, Zenon DEF check_root
+           <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v)
             BY <2>5, <4>2 DEF check_root
-          <4>. QED  BY <4>1, <4>2
+          <4>. QED  BY <4>1, <4>2 DEF check_root
         <3>3. num' \in [Nodes -> Nat \cup {-1}]  
             BY <2>5 DEF check_root        
         <3>4. lowlink' \in [Nodes -> Nat \cup {-1}]  
@@ -453,17 +454,106 @@ NumStackInv ==
   /\ \A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
         /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
         /\ t_stack[i] = t_stack[j] => i = j
+  /\ index + Cardinality({n \in Nodes : num[n] = -1}) = Cardinality(Nodes)
+  
+
+USE SuccsType
+USE IsFiniteSet(Nodes)
 
 THEOREM NumStack == Spec => []NumStackInv
 <1>1. Init => NumStackInv
+  <2> SUFFICES ASSUME Init
+               PROVE  NumStackInv
+    OBVIOUS
+   <2>1. index <= Cardinality(Nodes)
+    BY  FS_CardinalityType DEF Init, NumStackInv
+  <2>2. \A n \in Nodes : num[n] < Cardinality(Nodes)
+    BY  FS_CardinalityType DEF Init, NumStackInv
+  <2>3. \A n \in Nodes : onStack[n] <=> (num[n] \in Nat /\ \E i \in 1 .. Len(t_stack) :
+             t_stack[i] = n)
+    BY DEF Init, NumStackInv
+  <2>4. \A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
+           /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+           /\ t_stack[i] = t_stack[j] => i = j
+    BY DEF Init, NumStackInv
+  <2>5. index + Cardinality({n \in Nodes : num[n] = -1}) = Cardinality(Nodes)
+    BY FS_CardinalityType DEF vars, Init, NumStackInv
+  <2>6. QED
+    BY <2>1, <2>2, <2>3, <2>4, <2>5 DEF NumStackInv
 <1>2. TypeOK /\ NumStackInv /\ [Next]_vars => NumStackInv'
+  <2>. USE DEF TypeOK, NumStackInv
+  <2> SUFFICES ASSUME TypeOK,
+                      NumStackInv,
+                      [Next]_vars
+               PROVE  NumStackInv'
+    OBVIOUS
+  <2>1. CASE start_visit
+    <3>1. index' <= Cardinality(Nodes)
+        BY <2>1, FS_CardinalityType DEF start_visit
+    <3>2. \A n \in Nodes : num'[n] < Cardinality(Nodes)
+        BY <2>1 DEF start_visit
+    <3>3. \A n \in Nodes : onStack'[n] <=> (num'[n] \in Nat /\ \E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
+        BY <2>1 DEF start_visit
+    <3>4. \A i \in 1 .. Len(t_stack') : \A j \in 1 .. Len(t_stack') : 
+            /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+            /\ t_stack'[i] = t_stack'[j] => i = j
+      <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack'),
+                          NEW j \in 1 .. Len(t_stack')
+                   PROVE  /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+                          /\ t_stack'[i] = t_stack'[j] => i = j
+        OBVIOUS
+      <4>1. i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+        <5>1 i <= j => num'[t_stack'[j]] <= num'[t_stack'[i]]
+            BY <2>1 DEF vars, start_visit
+        <5>2 num'[t_stack'[j]] <= num'[t_stack'[i]] => i <= j
+            BY <2>1 DEF vars, start_visit
+        <5> QED
+            BY <2>1, <5>1, <5>2 DEF start_visit
+      <4>2. t_stack'[i] = t_stack'[j] => i = j
+        BY <2>1 DEF start_visit
+      <4>3. QED
+        BY <4>1, <4>2
+        
+    <3>5. index' + Cardinality({n \in Nodes : num'[n] = -1}) = Cardinality(Nodes)
+        BY <2>1 DEF start_visit
+    <3> QED
+        BY <2>1, <3>1, <3>2, <3>3, <3>4, <3>5 DEF start_visit
+  <2>2. CASE explore_succ
+    BY <2>2 DEF explore_succ
+  <2>3. CASE visit_recurse
+    BY <2>3 DEF visit_recurse
+  <2>4. CASE continue_visit
+    BY <2>4 DEF continue_visit
+  <2>5. CASE check_root
+      <3>1. index' <= Cardinality(Nodes)
+        BY <2>5 DEF check_root
+      <3>2. \A n \in Nodes : num'[n] < Cardinality(Nodes)
+        BY <2>5 DEF check_root
+      <3>3. \A n \in Nodes : onStack'[n] <=> (num'[n] \in Nat /\ \E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
+        BY <2>5 DEF check_root
+      <3>4. \A i \in 1 .. Len(t_stack') : \A j \in 1 .. Len(t_stack') : 
+        /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+        /\ t_stack'[i] = t_stack'[j] => i = j
+          BY <2>5 DEF check_root
+      <3>5. index' + Cardinality({n \in Nodes : num'[n] = -1}) = Cardinality(Nodes)
+        BY <2>5 DEF check_root
+    <3> QED BY <2>5, <3>1, <3>2, <3>3, <3>4, <3>5 DEF check_root
+  <2>6. CASE main
+    BY <2>6 DEF main
+  <2>7. CASE Terminating
+    BY <2>7 DEF vars, Terminating
+  <2>8. CASE UNCHANGED vars
+    BY <2>8 DEF vars 
+  <2>9. QED
+    BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
 <1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
 
 =============================================================================
 \* Modification History
+\* Last modified Wed Mar 18 18:39:03 CET 2020 by Angela Ipseiz
+\* Last modified Wed Mar 18 14:29:58 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 12 16:54:29 CET 2020 by merz
 \* Last modified Thu Mar 12 15:17:22 CET 2020 by merz
-\* Last modified Thu Mar 12 14:13:39 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 12 10:56:53 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 05 12:10:08 CET 2020 by Angela Ipseiz
 \* Last modified Tue Mar 03 11:04:54 CET 2020 by Angela Ipseiz
