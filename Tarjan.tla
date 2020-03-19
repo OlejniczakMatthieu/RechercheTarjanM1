@@ -263,7 +263,7 @@ TypeOK ==
   /\ stack \in Seq(StackEntry)
   /\ \A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
         /\ i < Len(stack)
-        /\ stack[i].v \in Nodes
+        /\ stack[i].v \in Nodes /\ num[stack[i].v] \in Nat
         /\ stack[i].w \in Nodes
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
      => /\ stack # << >> 
@@ -272,6 +272,8 @@ TypeOK ==
   /\ succs \in SUBSET Nodes
   /\ v \in Nodes \cup {defaultInitValue}
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
+  /\ pc = "start_visit" => num[v] = -1
+  /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat
   /\ pc \in {"visit_recurse", "continue_visit"} => w \in Nodes 
   /\ w \in Nodes \cup {defaultInitValue}
 
@@ -449,16 +451,14 @@ THEOREM TypeCorrect == Spec => []TypeOK
 
 NumStackInv ==
   /\ index <= Cardinality(Nodes)
-  /\ \A n \in Nodes : num[n] < Cardinality(Nodes)
-  /\ \A n \in Nodes : onStack[n] <=> (num[n] \in Nat /\ \E i \in 1 .. Len(t_stack) : t_stack[i] = n)
+  /\ \A n \in Nodes : num[n] < index
+  /\ \A n \in Nodes : onStack[n] <=> \E i \in 1 .. Len(t_stack) : t_stack[i] = n
+  /\ \A n \in Nodes : num[n] \in Nat <=> (onStack[n] \/ n \in UNION sccs)
   /\ \A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
         /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
         /\ t_stack[i] = t_stack[j] => i = j
   /\ index + Cardinality({n \in Nodes : num[n] = -1}) = Cardinality(Nodes)
   
-
-USE SuccsType
-USE IsFiniteSet(Nodes)
 
 THEOREM NumStack == Spec => []NumStackInv
 <1>1. Init => NumStackInv
@@ -494,16 +494,24 @@ THEOREM NumStack == Spec => []NumStackInv
                PROVE  NumStackInv'
         OBVIOUS
         <2>1. CASE start_visit
+            <3>0. /\ IsFiniteSet({n \in Nodes : num[n] = -1})
+                  /\ Cardinality({n \in Nodes : num[n] = -1}) \in Nat
+              BY FS_Subset, FS_CardinalityType
             <3>1. index' <= Cardinality(Nodes)
-                <4>1. index < Cardinality(Nodes)
-                    BY <2>1,FS_CardinalityType DEF start_visit
-                <4>2. index' = index + 1
-                    BY <2>1 DEF start_visit
-                <4> QED BY <4>1, <4>2, <2>1, FS_CardinalityType DEF start_visit 
+                <4>1. {n \in Nodes : num[n] = -1} # {}
+                  BY <2>1 DEF start_visit
+                <4>2. /\ Cardinality({n \in Nodes : num[n] = -1}) \in Nat
+                      /\ Cardinality({n \in Nodes : num[n] = -1}) # 0
+                  BY <4>1, <3>0, FS_EmptySet, FS_CardinalityType, Zenon
+                <4>3. index < Cardinality(Nodes)
+                    BY <2>1, <4>2, FS_CardinalityType DEF start_visit
+                <4> QED BY <4>3, <2>1, FS_CardinalityType DEF start_visit 
                 \*BY <2>1, FS_CardinalityType DEF start_visit
-            <3>2. \A n \in Nodes : num'[n] < Cardinality(Nodes)
-                BY <2>1, <3>1, FS_CardinalityType  DEF start_visit
-            <3>3. \A n \in Nodes : onStack'[n] <=> (num'[n] \in Nat /\ \E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
+            <3>2. \A n \in Nodes : num'[n] < index'
+                BY <2>1  DEF start_visit
+            <3>3. \A n \in Nodes : onStack'[n] <=> (\E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
+                BY <2>1 DEF start_visit
+            <3>a. \A n \in Nodes : num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
                 BY <2>1 DEF start_visit
             <3>4. \A i \in 1 .. Len(t_stack') : \A j \in 1 .. Len(t_stack') : 
                 /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
@@ -515,9 +523,9 @@ THEOREM NumStack == Spec => []NumStackInv
                     OBVIOUS
                 <4>1. i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
                     <5>1 i <= j => num'[t_stack'[j]] <= num'[t_stack'[i]]
-                        BY <2>1 DEF vars, start_visit
+                        BY <2>1 DEF start_visit
                     <5>2 num'[t_stack'[j]] <= num'[t_stack'[i]] => i <= j
-                        BY <2>1 DEF vars, start_visit
+                        BY <2>1 DEF start_visit
                     <5> QED
                         BY <2>1, <5>1, <5>2 DEF start_visit
                 <4>2. t_stack'[i] = t_stack'[j] => i = j
@@ -525,16 +533,16 @@ THEOREM NumStack == Spec => []NumStackInv
                 <4>3. QED
                     BY <4>1, <4>2
             <3>5. index' + Cardinality({n \in Nodes : num'[n] = -1}) = Cardinality(Nodes)
-                <4>1. index' = index + 1
-                    BY <2>1 DEF start_visit
-                <4>2. Cardinality({n \in Nodes : num'[n] # -1}) = index'
-                    BY <2>1, FS_CardinalityType DEF start_visit
-                <4>3. Cardinality({n \in Nodes : num'[n] # -1}) + Cardinality({n \in Nodes : num'[n] = -1}) = Cardinality(Nodes)
-                    BY <2>1, <4>2, FS_CardinalityType DEF start_visit
-                <4> QED BY <4>1, <4>2, <4>3, <2>1, FS_CardinalityType DEF start_visit
-                \*BY <2>1 DEF start_visit
+                <4>1. /\ v \in Nodes /\ num[v] = -1 /\ num'[v] # -1
+                      /\ \A n \in Nodes \ {v} : num'[n] = num[n]
+                   BY <2>1 DEF start_visit
+                <4>2. {n \in Nodes : num'[n] = -1} = {n \in Nodes : num[n] = -1} \ {v}
+                   BY <4>1
+                <4>3. Cardinality({n \in Nodes : num'[n] = -1}) = Cardinality({n \in Nodes : num[n] = -1}) - 1
+                   BY <3>0, <4>1, <4>2, FS_RemoveElement, Isa
+              <4> QED  BY <2>1, <4>3, <3>0 DEF start_visit
             <3> QED
-                BY <2>1, <3>1, <3>2, <3>3, <3>4, <3>5 DEF start_visit
+                BY <2>1, <3>1, <3>2, <3>3, <3>a, <3>4, <3>5
     <2>2. CASE explore_succ
         BY <2>2 DEF explore_succ
     <2>3. CASE visit_recurse
@@ -567,9 +575,10 @@ THEOREM NumStack == Spec => []NumStackInv
 
 =============================================================================
 \* Modification History
+\* Last modified Thu Mar 19 16:01:03 CET 2020 by merz
+\* Last modified Thu Mar 19 15:22:11 CET 2020 by merz
 \* Last modified Wed Mar 18 22:12:57 CET 2020 by Angela Ipseiz
 \* Last modified Wed Mar 18 14:29:58 CET 2020 by Angela Ipseiz
-\* Last modified Thu Mar 12 16:54:29 CET 2020 by merz
 \* Last modified Thu Mar 12 15:17:22 CET 2020 by merz
 \* Last modified Thu Mar 12 10:56:53 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 05 12:10:08 CET 2020 by Angela Ipseiz
