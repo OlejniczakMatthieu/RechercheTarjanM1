@@ -467,10 +467,11 @@ THEOREM NumStack == Spec => []NumStackInv
         OBVIOUS
     <2>1. index <= Cardinality(Nodes)
         BY  FS_CardinalityType DEF Init, NumStackInv
-    <2>2. \A n \in Nodes : num[n] < Cardinality(Nodes)
-        BY  FS_CardinalityType DEF Init, NumStackInv
-    <2>3. \A n \in Nodes : onStack[n] <=> (num[n] \in Nat /\ \E i \in 1 .. Len(t_stack) :
-             t_stack[i] = n)
+    <2>2. \A n \in Nodes : num[n] < index
+        BY DEF Init, NumStackInv
+    <2>3. \A n \in Nodes : onStack[n] <=> \E i \in 1 .. Len(t_stack) : t_stack[i] = n
+        BY DEF Init, NumStackInv
+    <2>a. \A n \in Nodes : num[n] \in Nat <=> (onStack[n] \/ n \in UNION sccs)
         BY DEF Init, NumStackInv
     <2>4. \A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
            /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
@@ -483,7 +484,7 @@ THEOREM NumStack == Spec => []NumStackInv
             BY DEF Init, NumStackInv
         <3> QED BY <3>1, <3>2, FS_CardinalityType DEF Init, NumStackInv
     <2>6. QED
-        BY <2>1, <2>2, <2>3, <2>4, <2>5 DEF NumStackInv
+        BY <2>1, <2>2, <2>3, <2>a, <2>4, <2>5 DEF NumStackInv
     
     
 <1>2. TypeOK /\ NumStackInv /\ [Next]_vars => NumStackInv'
@@ -493,7 +494,7 @@ THEOREM NumStack == Spec => []NumStackInv
                       [Next]_vars
                PROVE  NumStackInv'
         OBVIOUS
-        <2>1. CASE start_visit
+    <2>1. CASE start_visit
             <3>0. /\ IsFiniteSet({n \in Nodes : num[n] = -1})
                   /\ Cardinality({n \in Nodes : num[n] = -1}) \in Nat
               BY FS_Subset, FS_CardinalityType
@@ -506,29 +507,23 @@ THEOREM NumStack == Spec => []NumStackInv
                 <4>3. index < Cardinality(Nodes)
                     BY <2>1, <4>2, FS_CardinalityType DEF start_visit
                 <4> QED BY <4>3, <2>1, FS_CardinalityType DEF start_visit 
-                \*BY <2>1, FS_CardinalityType DEF start_visit
             <3>2. \A n \in Nodes : num'[n] < index'
                 BY <2>1  DEF start_visit
-            <3>3. \A n \in Nodes : onStack'[n] <=> (\E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
+            <3>3. \A n \in Nodes : onStack[n] <=> \E i \in 1 .. Len(t_stack) : t_stack[i] = n
                 BY <2>1 DEF start_visit
             <3>a. \A n \in Nodes : num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
                 BY <2>1 DEF start_visit
-            <3>4. \A i \in 1 .. Len(t_stack') : \A j \in 1 .. Len(t_stack') : 
-                /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
-                /\ t_stack'[i] = t_stack'[j] => i = j
-                <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack'),
-                          NEW j \in 1 .. Len(t_stack')
-                   PROVE  /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
-                          /\ t_stack'[i] = t_stack'[j] => i = j
+            <3>4. \A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
+                    /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+                    /\ t_stack[i] = t_stack[j] => i = j
+                <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack),
+                                  NEW j \in 1 .. Len(t_stack)
+                           PROVE  /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+                                  /\ t_stack[i] = t_stack[j] => i = j
                     OBVIOUS
-                <4>1. i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
-                    <5>1 i <= j => num'[t_stack'[j]] <= num'[t_stack'[i]]
-                        BY <2>1 DEF start_visit
-                    <5>2 num'[t_stack'[j]] <= num'[t_stack'[i]] => i <= j
-                        BY <2>1 DEF start_visit
-                    <5> QED
-                        BY <2>1, <5>1, <5>2 DEF start_visit
-                <4>2. t_stack'[i] = t_stack'[j] => i = j
+                <4>1. i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+                    BY <2>1 DEF start_visit
+                <4>2. t_stack[i] = t_stack[j] => i = j
                     BY <2>1 DEF start_visit
                 <4>3. QED
                     BY <4>1, <4>2
@@ -552,17 +547,42 @@ THEOREM NumStack == Spec => []NumStackInv
     <2>5. CASE check_root
         <3>1. index' <= Cardinality(Nodes)
             BY <2>5 DEF check_root
-        <3>2. \A n \in Nodes : num'[n] < Cardinality(Nodes)
+        <3>2. \A n \in Nodes : num'[n] < index'
             BY <2>5 DEF check_root
-        <3>3. \A n \in Nodes : onStack'[n] <=> (num'[n] \in Nat /\ \E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
-            BY <2>5 DEF check_root
-        <3>4. \A i \in 1 .. Len(t_stack') : \A j \in 1 .. Len(t_stack') : 
-            /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
-            /\ t_stack'[i] = t_stack'[j] => i = j
-            BY <2>5 DEF check_root
+        <3>3. \A n \in Nodes : onStack'[n] <=> \E i \in 1 .. Len(t_stack') : t_stack'[i] = n
+          <4>1. CASE \E k \in 1 .. Len(t_stack) : t_stack[k] = v
+                <5>1. LET k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v IN
+                            /\ sccs' = (sccs \cup {{t_stack[i] : i \in 1 .. k}})
+                            /\ onStack' = [n \in Nodes |-> IF \E i \in 1 .. k : n = t_stack[i] THEN FALSE
+                                                             ELSE onStack[n]]
+                            /\ t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
+                 <5> QED BY <4>1, <5>1, <2>5 DEF check_root
+          <4>2. CASE ~(\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
+                <5>1. UNCHANGED t_stack
+                    BY <2>5, <4>2 DEF check_root
+                <5> QED BY <4>2,<5>1, <2>5 DEF check_root
+          <4> QED BY <4>1, <4>2, <2>5 DEF check_root
+          
+        
+        <3>a. \A n \in Nodes : num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
+            
+        <3>4.\A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
+              /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+              /\ t_stack[i] = t_stack[j] => i = j
+            <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack),
+                              NEW j \in 1 .. Len(t_stack)
+                       PROVE  /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+                              /\ t_stack[i] = t_stack[j] => i = j
+                OBVIOUS
+            <4>1. i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+                BY <2>5 DEF check_root
+            <4>2. t_stack[i] = t_stack[j] => i = j
+                BY <2>5 DEF check_root
+            <4>3. QED
+                BY <4>1, <4>2
         <3>5. index' + Cardinality({n \in Nodes : num'[n] = -1}) = Cardinality(Nodes)
-            BY <2>5 DEF check_root
-        <3> QED BY <2>5, <3>1, <3>2, <3>3, <3>4, <3>5 DEF check_root
+            BY <2>5 DEF  check_root
+        <3> QED BY <2>5, <3>1, <3>2, <3>3, <3>a, <3>4, <3>5 DEF check_root
     <2>6. CASE main
         BY <2>6 DEF main
     <2>7. CASE Terminating
@@ -574,10 +594,10 @@ THEOREM NumStack == Spec => []NumStackInv
 <1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
 
 =============================================================================
-\* Modification History
+\* Last modified Thu Mar 19 17:55:34 CET 2020 by Angela Ipseiz
+\* Last modified Thu Mar 19 16:29:36 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 19 16:01:03 CET 2020 by merz
 \* Last modified Thu Mar 19 15:22:11 CET 2020 by merz
-\* Last modified Wed Mar 18 22:12:57 CET 2020 by Angela Ipseiz
 \* Last modified Wed Mar 18 14:29:58 CET 2020 by Angela Ipseiz
 \* Last modified Thu Mar 12 15:17:22 CET 2020 by merz
 \* Last modified Thu Mar 12 10:56:53 CET 2020 by Angela Ipseiz
