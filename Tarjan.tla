@@ -549,20 +549,34 @@ THEOREM NumStack == Spec => []NumStackInv
             BY <2>5 DEF check_root
         <3>2. \A n \in Nodes : num'[n] < index'
             BY <2>5 DEF check_root
-        <3>3. \A n \in Nodes : onStack'[n] <=> \E i \in 1 .. Len(t_stack') : t_stack'[i] = n
-          <4>1. CASE \E k \in 1 .. Len(t_stack) : t_stack[k] = v
-                <5>1. LET k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v IN
-                            /\ sccs' = (sccs \cup {{t_stack[i] : i \in 1 .. k}})
-                            /\ onStack' = [n \in Nodes |-> IF \E i \in 1 .. k : n = t_stack[i] THEN FALSE
-                                                             ELSE onStack[n]]
-                            /\ t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
-                 <5> QED BY <4>1, <5>1, <2>5 DEF check_root
-          <4>2. CASE ~(\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
-                <5>1. UNCHANGED t_stack
-                    BY <2>5, <4>2 DEF check_root
-                <5> QED BY <4>2,<5>1, <2>5 DEF check_root
-          <4> QED BY <4>1, <4>2, <2>5 DEF check_root
-          
+        <3>3. ASSUME NEW n \in Nodes
+              PROVE  onStack'[n] <=> \E i \in 1 .. Len(t_stack') : t_stack'[i] = n
+          <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v
+            <5>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
+            <5>. k \in 1 .. Len(t_stack)
+              BY <4>1
+            <5>2. /\ onStack' = [nn \in Nodes |-> IF \E i \in 1 .. k : nn = t_stack[i] THEN FALSE
+                                                  ELSE onStack[nn]]
+                  /\ t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
+              BY <2>5, <4>1, Zenon DEF check_root
+            <5>. HIDE DEF k
+            <5>3. (\E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
+                  <=> (\E i \in k+1 .. Len(t_stack) : t_stack[i] = n)
+              <6>1. ASSUME NEW i \in 1 .. Len(t_stack'), t_stack'[i] = n
+                    PROVE  /\ i+k \in k+1 .. Len(t_stack)
+                           /\ t_stack[i+k] = n
+                BY <5>2, <6>1
+              <6>2. ASSUME NEW i \in (k+1) .. Len(t_stack), t_stack[i] = n
+                    PROVE  /\ i-k \in 1 .. Len(t_stack')
+                           /\ t_stack'[i-k] = n
+                BY <5>2, <6>2
+              <6>. QED  BY <6>1, <6>2
+            <5>4. onStack'[n] <=> (\E i \in k+1 .. Len(t_stack) : t_stack[i] = n)
+              BY <5>2
+            <5> QED  BY <5>3, <5>4
+          <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v)
+            BY <2>5, <4>2, Zenon DEF check_root
+          <4> QED BY <4>1, <4>2
         
         <3>a. \A n \in Nodes : num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
             
