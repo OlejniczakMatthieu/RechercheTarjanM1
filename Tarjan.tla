@@ -549,6 +549,7 @@ THEOREM NumStack == Spec => []NumStackInv
             BY <2>5 DEF check_root
         <3>2. \A n \in Nodes : num'[n] < index'
             BY <2>5 DEF check_root
+            
         <3>3. ASSUME NEW n \in Nodes
               PROVE  onStack'[n] <=> \E i \in 1 .. Len(t_stack') : t_stack'[i] = n
           <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v
@@ -578,7 +579,77 @@ THEOREM NumStack == Spec => []NumStackInv
             BY <2>5, <4>2, Zenon DEF check_root
           <4> QED BY <4>1, <4>2
         
-        <3>a. \A n \in Nodes : num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
+        <3>a. ASSUME NEW n \in Nodes
+              PROVE  num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
+              
+          <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v
+            
+                                    
+            <5>a. CASE num'[n] \in Nat
+            
+                <6>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
+                <6>. k \in 1 .. Len(t_stack)
+                    BY <4>1
+                <6>2. /\ sccs' = (sccs \cup {{t_stack[i] : i \in 1 .. k}})
+                      /\ onStack' = [nn \in Nodes |-> IF \E i \in 1 .. k : nn = t_stack[i] THEN FALSE
+                                                  ELSE onStack[nn]]
+                    BY <2>5, <4>1, Zenon DEF check_root
+                <6>. HIDE DEF k
+          
+                <6>3. onStack'[n] \/ n \in UNION sccs'
+                    <7>1. ~onStack'[n] => n \in UNION sccs'
+                        <8>a. (n \in {{t_stack[i] : i \in 1 .. k}}) => (\E nn \in {{t_stack[i] : i \in 1 .. k}} : nn = n)
+                        <8>1.~onStack'[n] => (\E i \in 1 .. k : n = t_stack[i] \/ onStack[n] = FALSE)
+                            BY <6>2, <5>a, <2>5 DEF check_root
+                        <8>2. (\E i \in 1 .. k : n = t_stack[i]) => (n \in {{t_stack[i] : i \in 1 .. k}})
+                            BY <6>2, <2>5, <5>a , <8>a DEF check_root
+                        <8>3. onStack[n] = FALSE => (n \in UNION sccs)
+                            BY <2>5, <5>a DEF check_root
+                        <8>4. (n \in UNION sccs) => n \in UNION sccs'
+                            BY <2>5, Zenon DEF check_root
+                        <8>5. (n \in {{t_stack[i] : i \in 1 .. k}}) => n \in UNION sccs'
+                            BY <5>a, <2>5, <6>2 DEF check_root
+                        <8> QED BY <8>1, <8>2, <8>3, <8>4, <8>5
+                    <7> QED BY <7>1
+               <6> QED BY <6>2, <6>3, <5>a     
+            
+            <5>b. CASE ~(num'[n] \in Nat)  
+                <6>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
+                <6>1. onStack'[n] = onStack[n]
+                    <7>1. ~onStack[n] => ~(\E i \in 1 .. k : t_stack[i] = n)
+                        BY <2>5 DEF check_root
+                    <7>2. onStack' = [nn \in Nodes |-> IF \E i \in 1 .. k : nn = t_stack[i] THEN FALSE
+                                                  ELSE onStack[nn]]
+                          BY <2>5, <4>1, Zenon DEF check_root                      
+                    <7> QED BY <2>5, <4>1, <5>b, <7>1, <7>2 DEF check_root
+                <6>2. ~(n \in UNION sccs')
+                    <7>1. sccs' = (sccs \cup {{t_stack[i] : i \in 1 .. k}})
+                        BY <2>5, <4>1, Zenon DEF check_root                
+                    <7>2. ~onStack[n] => ~(\E i \in 1 .. k : t_stack[i] = n)
+                        BY <2>5 DEF check_root
+                    <7>3. ~(\E i \in 1 .. k : t_stack[i] = n) => ~(n \in {{t_stack[i] : i \in 1 .. k}})
+                        <8>1. ~(\E i \in 1 .. k : t_stack[i] = n) 
+                            BY <7>2, <5>b, <2>5 DEF check_root
+                        <8>2. ~(n \in {{t_stack[i] : i \in 1 .. k}})
+                            BY <5>b, <8>1, <2>5, <7>1 DEF check_root
+                        <8> QED BY <8>1, <8>2, Zenon
+                    <7>4. ~(num[n] \in Nat) 
+                        BY <5>b, <2>5 DEF check_root 
+                    <7>5. ~(n \in UNION sccs)   
+                        BY <5>b, <7>4
+                    <7> QED BY <2>5, <4>1, <5>b, <7>1, <7>2, <7>3, <7>4 DEF check_root
+                <6> QED BY <2>5, <4>1, <5>b, <6>1, <6>2 DEF check_root    
+                                    
+            <5> QED  BY <5>a, <5>b
+            
+          <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v) 
+            <5>1. num[n] \in Nat <=> (onStack[n] \/ n \in UNION sccs)
+                BY DEF NumStackInv
+            <5>2. UNCHANGED <<num, onStack, sccs>>
+                BY <2>5, <4>2 DEF check_root
+            <5> QED BY <5>1, <5>2, <4>2, <2>5 DEF check_root
+          <4> QED BY <4>1, <4>2
+        
             
         <3>4.\A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
               /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
