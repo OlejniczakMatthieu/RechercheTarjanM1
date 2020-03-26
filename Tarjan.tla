@@ -500,29 +500,28 @@ THEOREM NumStack == Spec => []NumStackInv
             <3>1. index' <= Cardinality(Nodes)
                 <4>1. {n \in Nodes : num[n] = -1} # {}
                   BY <2>1 DEF start_visit
-                <4>2. /\ Cardinality({n \in Nodes : num[n] = -1}) \in Nat
-                      /\ Cardinality({n \in Nodes : num[n] = -1}) # 0
-                  BY <4>1, <3>0, FS_EmptySet, FS_CardinalityType, Zenon
+                <4>2. Cardinality({n \in Nodes : num[n] = -1}) # 0
+                  BY <4>1, <3>0, FS_EmptySet, Isa
                 <4>3. index < Cardinality(Nodes)
-                    BY <2>1, <4>2, FS_CardinalityType DEF start_visit
+                    BY <2>1, <3>0, <4>2, FS_CardinalityType DEF start_visit
                 <4> QED BY <4>3, <2>1, FS_CardinalityType DEF start_visit 
             <3>2. \A n \in Nodes : num'[n] < index'
                 BY <2>1  DEF start_visit
-            <3>3. \A n \in Nodes : onStack[n] <=> \E i \in 1 .. Len(t_stack) : t_stack[i] = n
+            <3>3. \A n \in Nodes : onStack'[n] <=> \E i \in 1 .. Len(t_stack') : t_stack'[i] = n
                 BY <2>1 DEF start_visit
             <3>a. \A n \in Nodes : num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
                 BY <2>1 DEF start_visit
-            <3>4. \A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
-                    /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
-                    /\ t_stack[i] = t_stack[j] => i = j
-                <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack),
-                                  NEW j \in 1 .. Len(t_stack)
-                           PROVE  /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
-                                  /\ t_stack[i] = t_stack[j] => i = j
+            <3>4. \A i \in 1 .. Len(t_stack') : \A j \in 1 .. Len(t_stack') : 
+                    /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+                    /\ t_stack'[i] = t_stack'[j] => i = j
+                <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack'),
+                                  NEW j \in 1 .. Len(t_stack')
+                           PROVE  /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+                                  /\ t_stack'[i] = t_stack'[j] => i = j
                     OBVIOUS
-                <4>1. i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+                <4>1. i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
                     BY <2>1 DEF start_visit
-                <4>2. t_stack[i] = t_stack[j] => i = j
+                <4>2. t_stack'[i] = t_stack'[j] => i = j
                     BY <2>1 DEF start_visit
                 <4>3. QED
                     BY <4>1, <4>2
@@ -645,17 +644,17 @@ THEOREM NumStack == Spec => []NumStackInv
           <4> QED BY <4>1, <4>2
         
             
-        <3>4.\A i \in 1 .. Len(t_stack) : \A j \in 1 .. Len(t_stack) : 
-              /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
-              /\ t_stack[i] = t_stack[j] => i = j
-            <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack),
-                              NEW j \in 1 .. Len(t_stack)
-                       PROVE  /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
-                              /\ t_stack[i] = t_stack[j] => i = j
+        <3>4.\A i \in 1 .. Len(t_stack') : \A j \in 1 .. Len(t_stack') : 
+              /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+              /\ t_stack'[i] = t_stack'[j] => i = j
+            <4> SUFFICES ASSUME NEW i \in 1 .. Len(t_stack'),
+                              NEW j \in 1 .. Len(t_stack')
+                       PROVE  /\ i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
+                              /\ t_stack'[i] = t_stack'[j] => i = j
                 OBVIOUS
-            <4>1. i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
+            <4>1. i <= j <=> num'[t_stack'[j]] <= num'[t_stack'[i]]
                 BY <2>5 DEF check_root
-            <4>2. t_stack[i] = t_stack[j] => i = j
+            <4>2. t_stack'[i] = t_stack'[j] => i = j
                 BY <2>5 DEF check_root
             <4>3. QED
                 BY <4>1, <4>2
@@ -671,6 +670,51 @@ THEOREM NumStack == Spec => []NumStackInv
     <2>9. QED
         BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
 <1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
+
+LowlinkInv ==
+  /\ \A x \in Nodes : num[x] \in Nat => 
+        /\ lowlink[x] <= num[x]
+        /\ \E y \in Nodes : num[y] = lowlink[x] /\ <<x,y>> \in Connected
+  /\ v \in Nodes => 
+      \A x \in Succs[v] \ succs :
+        /\ \/ pc \in {"explore_succ", "visit_recurse", "check_root"}
+           \/ pc = "continue_visit" /\ x # w
+        /\ onStack[x]
+        => lowlink[v] <= lowlink[x]
+
+StackReachabilityInv ==
+  /\ \A x,y \in Nodes : onStack[x] /\ onStack[y] /\ num[x] <= num[y] => <<x,y>> \in Connected
+  /\ \A y \in Nodes : onStack[y] => \E x \in Nodes : onStack[x] /\ num[x] <= num[y] /\ <<y,x>> \in Connected
+
+THEOREM StackReachability == Spec => []StackReachabilityInv
+<1>1. Init => StackReachabilityInv
+  BY DEF Init, StackReachabilityInv
+<1>2. TypeOK /\ NumStackInv /\ StackReachabilityInv /\ [Next]_vars => StackReachabilityInv'
+  <2> SUFFICES ASSUME TypeOK,
+                      NumStackInv,
+                      StackReachabilityInv,
+                      [Next]_vars
+               PROVE  StackReachabilityInv'
+    OBVIOUS
+  <2>. USE DEF TypeOK, NumStackInv, StackReachabilityInv
+  <2>1. CASE start_visit
+  <2>2. CASE explore_succ
+    BY <2>2 DEF explore_succ
+  <2>3. CASE visit_recurse
+    BY <2>3 DEF visit_recurse
+  <2>4. CASE continue_visit
+    BY <2>4 DEF continue_visit
+  <2>5. CASE check_root
+  <2>6. CASE main
+    BY <2>6 DEF main
+  <2>7. CASE Terminating
+    BY <2>7 DEF Terminating, vars
+  <2>8. CASE UNCHANGED vars
+    BY <2>8 DEF vars
+  <2>9. QED
+    BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
+<1>. QED  BY TypeCorrect, NumStack, <1>1, <1>2, PTL DEF Spec
+
 
 =============================================================================
 \* Last modified Thu Mar 19 17:55:34 CET 2020 by Angela Ipseiz
