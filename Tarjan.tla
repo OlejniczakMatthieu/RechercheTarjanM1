@@ -536,7 +536,7 @@ THEOREM NumStack == Spec => []NumStackInv
                    BY <3>0, <4>1, <4>2, FS_RemoveElement, Isa
               <4> QED  BY <2>1, <4>3, <3>0 DEF start_visit
             <3> QED
-                BY <2>1, <3>1, <3>2, <3>3, <3>a, <3>4, <3>5
+                BY <2>1, <3>0, <3>1, <3>2, <3>3, <3>a, <3>4, <3>5 DEF start_visit
     <2>2. CASE explore_succ
         BY <2>2 DEF explore_succ
     <2>3. CASE visit_recurse
@@ -621,10 +621,10 @@ THEOREM NumStack == Spec => []NumStackInv
                         BY <2>5, <4>1, Zenon DEF check_root                
                     <7>2. ~onStack[n] => ~(\E i \in 1 .. k : t_stack[i] = n)
                         BY <2>5 DEF check_root
-                    <7>3. ~(\E i \in 1 .. k : t_stack[i] = n) => ~(n \in {{t_stack[i] : i \in 1 .. k}})
+                    <7>3. ~(\E i \in 1 .. k : t_stack[i] = n) => ~(n \in {t_stack[i] : i \in 1 .. k})
                         <8>1. ~(\E i \in 1 .. k : t_stack[i] = n) 
                             BY <7>2, <5>b, <2>5 DEF check_root
-                        <8>2. ~(n \in {{t_stack[i] : i \in 1 .. k}})
+                        <8>2. ~(n \in {t_stack[i] : i \in 1 .. k})
                             BY <5>b, <8>1, <2>5, <7>1 DEF check_root
                         <8> QED BY <8>1, <8>2, Zenon
                     <7>4. ~(num[n] \in Nat) 
