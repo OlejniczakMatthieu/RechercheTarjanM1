@@ -458,7 +458,6 @@ NumStackInv ==
         /\ i <= j <=> num[t_stack[j]] <= num[t_stack[i]]
         /\ t_stack[i] = t_stack[j] => i = j
   /\ index + Cardinality({n \in Nodes : num[n] = -1}) = Cardinality(Nodes)
-  
 
 THEOREM NumStack == Spec => []NumStackInv
 <1>1. Init => NumStackInv
@@ -584,8 +583,9 @@ THEOREM NumStack == Spec => []NumStackInv
               
           <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v
             
-                                    
-            <5>a. CASE num'[n] \in Nat
+            <5>. UNCHANGED num
+              BY <2>5 DEF check_root
+            <5>a. CASE num[n] \in Nat
             
                 <6>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
                 <6>. k \in 1 .. Len(t_stack)
@@ -596,24 +596,18 @@ THEOREM NumStack == Spec => []NumStackInv
                     BY <2>5, <4>1, Zenon DEF check_root
                 <6>. HIDE DEF k
           
-                <6>3. onStack'[n] \/ n \in UNION sccs'
-                    <7>1. ~onStack'[n] => n \in UNION sccs'
-                        <8>a. (n \in {{t_stack[i] : i \in 1 .. k}}) => (\E nn \in {{t_stack[i] : i \in 1 .. k}} : nn = n)
-                        <8>1.~onStack'[n] => (\E i \in 1 .. k : n = t_stack[i] \/ onStack[n] = FALSE)
-                            BY <6>2, <5>a, <2>5 DEF check_root
-                        <8>2. (\E i \in 1 .. k : n = t_stack[i]) => (n \in {{t_stack[i] : i \in 1 .. k}})
-                            BY <6>2, <2>5, <5>a , <8>a DEF check_root
-                        <8>3. onStack[n] = FALSE => (n \in UNION sccs)
-                            BY <2>5, <5>a DEF check_root
-                        <8>4. (n \in UNION sccs) => n \in UNION sccs'
-                            BY <2>5, Zenon DEF check_root
-                        <8>5. (n \in {{t_stack[i] : i \in 1 .. k}}) => n \in UNION sccs'
-                            BY <5>a, <2>5, <6>2 DEF check_root
-                        <8> QED BY <8>1, <8>2, <8>3, <8>4, <8>5
-                    <7> QED BY <7>1
-               <6> QED BY <6>2, <6>3, <5>a     
+                <6>3. ASSUME ~onStack'[n]
+                      PROVE  n \in UNION sccs'
+                  <7>1. ~ onStack[n] \/ n \in {t_stack[i] : i \in 1 .. k}
+                     BY <6>2, <6>3
+                  <7>2. ~ onStack[n] => (n \in UNION sccs')
+                    BY <5>a, <6>2
+                  <7>3. (n \in {t_stack[i] : i \in 1 .. k}) => n \in UNION sccs'
+                    BY <6>2, Isa
+                  <7> QED BY <7>1, <7>2, <7>3
+               <6> QED BY <6>3, <5>a     
             
-            <5>b. CASE ~(num'[n] \in Nat)  
+            <5>b. CASE ~(num[n] \in Nat)  
                 <6>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
                 <6>1. onStack'[n] = onStack[n]
                     <7>1. ~onStack[n] => ~(\E i \in 1 .. k : t_stack[i] = n)
