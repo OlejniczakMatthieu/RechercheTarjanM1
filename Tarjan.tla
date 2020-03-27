@@ -671,6 +671,37 @@ THEOREM NumStack == Spec => []NumStackInv
         BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
 <1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
 
+-----------------------------------------------------------------------------
+
+(***************************************************************************)
+(* Nodes are colored to monitor to what extent they have been explored.    *)
+(* A node is white if its exploration has not yet started, it is gray if   *)
+(* it is being explored, i.e. it is on the call stack or the currently     *)
+(* visited node, and black otherwise.                                      *)
+(***************************************************************************)
+White == {n \in Nodes : num[n] \notin Nat}
+Gray == {n \in Nodes : n = v \/ \E i \in 1 .. Len(stack) : n = stack[i].v}
+Black == Nodes \ (White \cup Gray)
+
+ColorInv ==
+  /\ (* Nodes that are no longer in toVisit aren't white *)
+     White \subseteq toVisit \cup (IF pc = "start_visit" THEN {v} ELSE {})
+  /\ (* Successors of a visited node that are no longer in succs aren't white *)
+     pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
+     => White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {})
+  /\ (* analogous condition for stack entries *)
+     \A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
+        /\ White \cap Succs[stack[i].v] 
+           \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {})
+  /\ (* black nodes do not have white successors *)
+     \A n \in Black : Succs[n] \cap White = {}
+
+THEOREM Color == Spec => []ColorInv
+<1>1. Init => ColorInv
+<1>2. TypeOK /\ ColorInv /\ [Next]_vars => ColorInv'
+<1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
+
+(*
 LowlinkInv ==
   /\ \A x \in Nodes : num[x] \in Nat => 
         /\ lowlink[x] <= num[x]
@@ -681,6 +712,7 @@ LowlinkInv ==
            \/ pc = "continue_visit" /\ x # w
         /\ onStack[x]
         => lowlink[v] <= lowlink[x]
+*)
 
 StackReachabilityInv ==
   /\ \A x,y \in Nodes : onStack[x] /\ onStack[y] /\ num[x] <= num[y] => <<x,y>> \in Connected
