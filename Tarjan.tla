@@ -273,6 +273,7 @@ TypeOK ==
   /\ v \in Nodes \cup {defaultInitValue}
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
   /\ pc = "start_visit" => num[v] = -1
+  /\ pc = "visit_recurse" => num[w] = -1
   /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat
   /\ pc \in {"visit_recurse", "continue_visit"} => w \in Nodes 
   /\ w \in Nodes \cup {defaultInitValue}
@@ -329,15 +330,21 @@ THEOREM TypeCorrect == Spec => []TypeOK
     <3>14. (pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes)'
       BY <2>3 DEF StackEntry, visit_recurse
     <3>15. (pc = "start_visit" => num[v] = -1)'
-      BY <2>3 DEF StackEntry, visit_recurse
+       <4>1. v' = w
+          BY <2>3 DEF visit_recurse
+       <4>2. num[w] = -1
+          BY <2>3 DEF visit_recurse 
+        <4> QED BY <2>3, <4>1, <4>2 DEF StackEntry, visit_recurse
     <3>16. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat)'
       BY <2>3 DEF StackEntry, visit_recurse
     <3>17. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes)'
       BY <2>3 DEF StackEntry, visit_recurse
     <3>18. (w \in Nodes \cup {defaultInitValue})'
       BY <2>3 DEF StackEntry, visit_recurse
-    <3>19. QED
-      BY <3>1, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9 DEF TypeOK
+    <3>19. (pc = "visit_recurse" => num[w] = -1)'
+      BY <2>3 DEF visit_recurse
+    <3>. QED
+      BY <3>1, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9 DEF TypeOK
     
   <2>4. CASE continue_visit
     BY <2>4 DEF continue_visit
@@ -352,9 +359,9 @@ THEOREM TypeCorrect == Spec => []TypeOK
               BY <2>5, <4>1 DEF check_root
             <5>2. k \in 1 .. Len(t_stack)
               BY <4>1
-            <5>3. \A i \in k+1 .. Len(t_stack) : t_stack[i] \in Nodes /\ t_stack[i] = t_stack'[i-k] 
+            <5>3. \A i \in k+1 .. Len(t_stack) : t_stack[i] \in Nodes /\ t_stack[i] = t_stack'[i - k]
                 BY <2>5, <5>1, <5>2, <4>1 DEF check_root
-            <5>. QED  BY  <5>1, <5>2, <5>3, <4>1 DEF check_root
+            <5>. QED  BY  <2>5, <5>1, <5>2, <5>3, <4>1 DEF check_root
            <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1..Len(t_stack) : t_stack[k] = v)
             BY <2>5, <4>2 DEF check_root
           <4>. QED  BY <4>1, <4>2 DEF check_root
@@ -451,8 +458,20 @@ THEOREM TypeCorrect == Spec => []TypeOK
             <4>2. UNCHANGED num
                 BY <2>5 DEF check_root
             <4> QED BY <2>5, <4>1, <4>2 DEF check_root
+        <3>16. (pc = "visit_recurse" => num[w] = -1)'
+           <4>1. pc' \in {"continue_visit", "main"}
+                <5>1. stack # << >>
+                    BY <2>5 DEF check_root
+                <5>2. Head(stack) \in StackEntry
+                    BY <2>5 DEF check_root 
+                <5>3. pc' = Head(stack).pc
+                    BY <2>5 DEF check_root
+                <5>4  Head(stack).pc \in {"continue_visit", "main"} 
+                    BY <2>5, <5>1, <5>2, <5>3 DEF check_root, StackEntry
+                <5> QED BY <5>1, <5>2, <5>3, <5>4, <2>5 DEF check_root 
+            <4> QED BY <2>5, <4>1 DEF check_root
         <3>. QED
-            BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15 DEF check_root
+            BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16 DEF check_root
   
   <2>6. CASE main
     <3>1. index' \in Nat
@@ -512,8 +531,10 @@ THEOREM TypeCorrect == Spec => []TypeOK
         BY <2>6 DEF main
     <3>18. pc' \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num'[v'] \in Nat
         BY <2>6 DEF main
+    <3>19.  (pc = "visit_recurse" => num[w] = -1)'
+        BY <2>6 DEF main
     <3>. QED
-        BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18 DEF main
+        BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19 DEF main
   
   <2>7. CASE Terminating
     BY <2>7 DEF vars, Terminating
