@@ -835,6 +835,44 @@ ColorInv ==
 THEOREM Color == Spec => []ColorInv
 <1>1. Init => ColorInv
 <1>2. TypeOK /\ ColorInv /\ [Next]_vars => ColorInv'
+  <2>. USE DEF TypeOK, ColorInv, White, Black, Gray
+  <2> SUFFICES ASSUME TypeOK,
+                      ColorInv,
+                      [Next]_vars
+               PROVE  ColorInv'
+    OBVIOUS
+  <2>1. CASE start_visit
+    BY <2>1 DEF start_visit
+  <2>2. CASE explore_succ
+    BY <2>2 DEF explore_succ
+  <2>3. CASE visit_recurse
+    BY <2>3 DEF visit_recurse
+  <2>4. CASE continue_visit
+    BY <2>4 DEF continue_visit
+  <2>5. CASE check_root
+    <3>1. (White \subseteq toVisit \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
+      BY <2>5 DEF check_root
+    <3>2. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
+           => White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {}))'
+      <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v
+      <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v)
+      <4> QED BY <2>5, <4>1, <4>2 DEF check_root
+    <3>3. (\A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
+              /\ White \cap Succs[stack[i].v] 
+                 \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
+      BY <2>5 DEF check_root
+    <3>4. (\A n \in Black : Succs[n] \cap White = {})'
+      BY <2>5 DEF check_root
+    <3>5. QED
+      BY <3>1, <3>2, <3>3, <3>4 DEF ColorInv 
+  <2>6. CASE main
+    BY <2>6 DEF main
+  <2>7. CASE Terminating
+    BY <2>7 DEF vars, Terminating
+  <2>8. CASE UNCHANGED vars
+    BY <2>8 DEF vars
+  <2>9. QED
+    BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
 <1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
 
 (*
@@ -856,31 +894,7 @@ StackReachabilityInv ==
 
 THEOREM StackReachability == Spec => []StackReachabilityInv
 <1>1. Init => StackReachabilityInv
-  BY DEF Init, StackReachabilityInv
 <1>2. TypeOK /\ NumStackInv /\ StackReachabilityInv /\ [Next]_vars => StackReachabilityInv'
-  <2> SUFFICES ASSUME TypeOK,
-                      NumStackInv,
-                      StackReachabilityInv,
-                      [Next]_vars
-               PROVE  StackReachabilityInv'
-    OBVIOUS
-  <2>. USE DEF TypeOK, NumStackInv, StackReachabilityInv
-  <2>1. CASE start_visit
-  <2>2. CASE explore_succ
-    BY <2>2 DEF explore_succ
-  <2>3. CASE visit_recurse
-    BY <2>3 DEF visit_recurse
-  <2>4. CASE continue_visit
-    BY <2>4 DEF continue_visit
-  <2>5. CASE check_root
-  <2>6. CASE main
-    BY <2>6 DEF main
-  <2>7. CASE Terminating
-    BY <2>7 DEF Terminating, vars
-  <2>8. CASE UNCHANGED vars
-    BY <2>8 DEF vars
-  <2>9. QED
-    BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
 <1>. QED  BY TypeCorrect, NumStack, <1>1, <1>2, PTL DEF Spec
 
 
