@@ -854,27 +854,45 @@ THEOREM Color == Spec => []ColorInv
       BY <2>5 DEF check_root
     <3>2. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {}))'
+      <4>a. pc' =  Head(stack).pc 
+            BY <2>5 DEF check_root
+      <4>b. Head(stack).pc \in {"continue_visit", "main"}
+            <5>1. stack # << >>
+                BY <2>5 DEF check_root
+            <5>2. Head(stack) \in StackEntry
+                BY <5>1
+            <5>3. pc' = Head(stack).pc
+                BY <2>5, <5>2 DEF check_root, StackEntry
+            <5> QED BY <2>5, <5>1, <5>2 DEF StackEntry, check_root
       <4>1. CASE lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v
-        <5> SUFFICES ASSUME NEW k \in 1 .. Len(t_stack),
-                            t_stack[k] = v,
-                            (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"})'
-                     PROVE  (White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {}))'
-          BY <4>1 
-        <5> QED
-          BY <4>1 DEF check_root
-        
+        BY <2>5, <4>1, <4>a, <4>b DEF check_root  
       <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v)
-        BY <4>2 DEF check_root
+        <5>1. pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
+           => White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {})
+            BY <2>5 DEF check_root
+        <5>2. UNCHANGED <<num, sccs>>
+            BY <2>5, <4>2 DEF check_root
+        <5> QED BY <2>5, <4>2, <5>1, <5>2, <4>a, <4>b  DEF check_root
       <4> QED BY <2>5, <4>1, <4>2 DEF check_root
     <3>3. (\A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
               /\ White \cap Succs[stack[i].v] 
                  \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
       BY <2>5 DEF check_root
     <3>4. (\A n \in Black : Succs[n] \cap White = {})'
-      BY <2>5 DEF check_root
+      <4> SUFFICES ASSUME NEW n \in Black'
+                   PROVE  (Succs[n] \cap White = {})'
+        OBVIOUS
+      <4>1. Succs[n] \cap White = {}
+        <5>1. CASE Black' =  Black \cup {v}
+        <5>2. CASE Black' = Black \cup (\E i \in 1 .. Len(stack) : n = stack[i].v)
+        <5> QED BY <2>5, <5>1, <5>2 DEF check_root
+      <4>2. White' = White
+        BY <2>5 DEF check_root
+      <4> QED
+        BY <2>5, <4>1, <4>2 DEF check_root
+      
     <3>5. QED
       BY <3>1, <3>2, <3>3, <3>4 DEF ColorInv 
-      
   <2>6. CASE main
     <3>1. (White \subseteq toVisit \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
       BY <2>6 DEF main
@@ -894,18 +912,13 @@ THEOREM Color == Spec => []ColorInv
         BY <2>6 DEF main, Init, visit, StackEntry
       <4>2. QED
         BY <4>1
-      
     <3>4. (\A n \in Black : Succs[n] \cap White = {})'
         <4>1. \A m \in Black : Succs[m] \cap White = {}
             BY <2>6 DEF main
       <4> QED
         BY <2>6, <4>1 DEF main, Init, visit, StackEntry, Next, TypeOK, White, Gray, Black
-        
-      
     <3>5. QED
       BY <3>1, <3>2, <3>3, <3>4 DEF ColorInv
-      
-      
   <2>7. CASE Terminating
     BY <2>7 DEF vars, Terminating
   <2>8. CASE UNCHANGED vars
