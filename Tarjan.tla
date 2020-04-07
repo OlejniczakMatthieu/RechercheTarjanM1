@@ -261,17 +261,38 @@ TypeOK ==
   /\ toVisit \in SUBSET Nodes
   /\ pc \in {"main", "Done", "start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
   /\ stack \in Seq(StackEntry)
+  /\ \A i \in 1 .. Len(stack) :
+        \/ /\ i < Len(stack)
+           /\ stack[i].pc = "continue_visit"
+           /\ stack[i].v \in Nodes /\ num[stack[i].v] \in Nat
+           /\ stack[i].w \in Nodes
+        \/ /\ i = Len(stack)
+           /\ stack[i].pc = "main"
+           /\ stack[i].v = defaultInitValue
+(*** ancienne version
   /\ \A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
         /\ i < Len(stack)
         /\ stack[i].v \in Nodes /\ num[stack[i].v] \in Nat
         /\ stack[i].w \in Nodes
+***)
+  /\ \/ pc \in {"main", "Done"} /\ stack = << >>
+     \/ /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
+        /\ stack # << >>
+(*** ancienne version
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
      => /\ stack # << >> 
         /\ Head(stack).pc = "continue_visit" => Head(stack).v \in Nodes 
         /\ Head(stack).pc = "continue_visit" => Head(stack).w \in Nodes
+***)
   /\ succs \in SUBSET Nodes
+  /\ pc = "check_root" => succs = {}   \* ajout
   /\ v \in Nodes \cup {defaultInitValue}
+  /\ \/ pc \in {"main", "Done"} /\ v = defaultInitValue
+     \/ /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
+        /\ v \in Nodes
+(*** ancienne version
   /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
+***)
   /\ pc = "start_visit" => num[v] = -1
   /\ pc = "visit_recurse" => num[w] = -1
   /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat
@@ -827,8 +848,8 @@ ColorInv ==
      => White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {})
   /\ (* analogous condition for stack entries *)
      \A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
-        /\ White \cap Succs[stack[i].v] 
-           \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {})
+          White \cap Succs[stack[i].v] 
+          \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {})
   /\ (* black nodes do not have white successors *)
      \A n \in Black : Succs[n] \cap White = {}
 
@@ -875,22 +896,29 @@ THEOREM Color == Spec => []ColorInv
         <5> QED BY <2>5, <4>2, <5>1, <5>2, <4>a, <4>b  DEF check_root
       <4> QED BY <2>5, <4>1, <4>2 DEF check_root
     <3>3. (\A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
-              /\ White \cap Succs[stack[i].v] 
-                 \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
+              White \cap Succs[stack[i].v] 
+              \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
       BY <2>5 DEF check_root
     <3>4. (\A n \in Black : Succs[n] \cap White = {})'
-      <4> SUFFICES ASSUME NEW n \in Black'
-                   PROVE  (Succs[n] \cap White = {})'
-        OBVIOUS
-      <4>1. Succs[n] \cap White = {}
-        <5>1. CASE Black' =  Black \cup {v}
-        <5>2. CASE Black' = Black \cup (\E i \in 1 .. Len(stack) : n = stack[i].v)
-        <5> QED BY <2>5, <5>1, <5>2 DEF check_root
-      <4>2. White' = White
+      <4>1. White' = White
+        BY <2>5 DEF check_root, White
+      <4>2. Gray \subseteq Gray' \cup {v}
+        <5>. SUFFICES ASSUME NEW i \in 1 .. Len(stack), stack[i].v \in Gray
+                      PROVE  stack[i].v \in Gray'
+          BY DEF Gray
+        <5>1. CASE i = 1
+          BY <5>1, <2>5 DEF check_root, Gray
+        <5>2. CASE i \in 2 .. Len(stack)
+          <6>1. /\ i-1 \in 1 .. Len(stack')
+                /\ stack'[i-1] = stack[i]
+            BY <5>2, <2>5 DEF check_root
+          <6>. QED  BY <6>1 DEF Gray
+        <5>. QED  BY <5>1, <5>2
+      <4>3. Black' \subseteq Black \cup {v}
+        BY <4>1, <4>2 DEF Black
+      <4>4. Succs[v] \cap White = {}
         BY <2>5 DEF check_root
-      <4> QED
-        BY <2>5, <4>1, <4>2 DEF check_root
-      
+      <4>. QED  BY <4>1, <4>3, <4>4
     <3>5. QED
       BY <3>1, <3>2, <3>3, <3>4 DEF ColorInv 
   <2>6. CASE main
@@ -900,23 +928,11 @@ THEOREM Color == Spec => []ColorInv
            => White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {}))'
       BY <2>6 DEF main
     <3>3. (\A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
-              /\ White \cap Succs[stack[i].v] 
-                 \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
-      <4> SUFFICES ASSUME NEW i \in (1 .. Len(stack))',
-                          (stack[i].pc = "continue_visit")'
-                   PROVE  (/\ White \cap Succs[stack[i].v] 
-                              \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
-        OBVIOUS
-      <4>1. (White \cap Succs[stack[i].v] 
-             \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
-        BY <2>6 DEF main, Init, visit, StackEntry
-      <4>2. QED
-        BY <4>1
+              White \cap Succs[stack[i].v] 
+              \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
+      BY <2>6 DEF main, White, Gray, Black
     <3>4. (\A n \in Black : Succs[n] \cap White = {})'
-        <4>1. \A m \in Black : Succs[m] \cap White = {}
-            BY <2>6 DEF main
-      <4> QED
-        BY <2>6, <4>1 DEF main, Init, visit, StackEntry, Next, TypeOK, White, Gray, Black
+      BY <2>6 DEF main, White, Gray, Black
     <3>5. QED
       BY <3>1, <3>2, <3>3, <3>4 DEF ColorInv
   <2>7. CASE Terminating
