@@ -630,7 +630,11 @@ THEOREM NumStack == Spec => []NumStackInv
                 <4>1. CASE n = v
                     BY <2>1, <4>1 DEF start_visit
                 <4>2. CASE n # v
-                    BY <2>1, <4>2 DEF start_visit
+                    <5>1. onStack'[n] = onStack[n]
+                        BY <2>1, <4>2 DEF start_visit
+                    <5>2. (\E i \in 1 .. Len(t_stack) : t_stack[i] = n) => (\E i \in 1 .. Len(t_stack') : t_stack'[i] = n)
+                        BY <2>1, <4>2 DEF start_visit
+                    <5> QED BY <2>1, <4>2, <5>1, <5>2 DEF start_visit
                 <4> QED BY <2>1, <4>1, <4>2 DEF start_visit
             <3>a. \A n \in Nodes : num'[n] \in Nat <=> (onStack'[n] \/ n \in UNION sccs')
                 BY <2>1 DEF start_visit
@@ -651,7 +655,11 @@ THEOREM NumStack == Spec => []NumStackInv
                         BY <2>1, <5>3 DEF start_visit
                     <5> QED BY <5>1, <5>2, <5>3, <2>1 DEF start_visit
                 <4>2. t_stack'[i] = t_stack'[j] => i = j
-                    BY <2>1 DEF start_visit
+                    <5>1. onStack[v] = FALSE
+                        BY <2>1 DEF start_visit
+                    <5>2. ~(\E ii \in 1 .. Len(t_stack)-1 : t_stack[ii] = v) 
+                        BY <2>1 DEF start_visit
+                    <5> QED BY <2>1, <5>1, <5>2 DEF start_visit
                 <4>3. QED
                     BY <4>1, <4>2
             <3>5. index' + Cardinality({n \in Nodes : num'[n] = -1}) = Cardinality(Nodes)
@@ -703,7 +711,9 @@ THEOREM NumStack == Spec => []NumStackInv
               BY <5>2
             <5> QED  BY <5>3, <5>4
           <4>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v)
-            BY <2>5, <4>2, Zenon DEF check_root
+            <5>1. UNCHANGED <<onStack, t_stack>>
+                BY <2>5, <4>2, Zenon DEF check_root
+            <5> QED BY <2>5, <4>2, <5>1  DEF check_root
           <4> QED BY <4>1, <4>2
         
         <3>a. ASSUME NEW n \in Nodes
@@ -791,9 +801,7 @@ THEOREM NumStack == Spec => []NumStackInv
                     <6>2. /\ i \in k+1 .. Len(t_stack) => i \in 1 .. Len(t_stack') 
                           /\ j \in k+1 .. Len(t_stack) => j \in 1 .. Len(t_stack') 
                           BY <2>5, <5>1 DEF check_root
-                   <6>3. (t_stack[i] = t_stack[j] => i = j) =>  (t_stack'[i] = t_stack'[j]  => i = j)
-                          BY <2>5, <5>1, <6>0, <6>2 DEF check_root
-                    <6> QED BY <5>1, <2>5, <6>2, <6>0, <6>3 DEF check_root
+                    <6> QED BY <5>1, <2>5, <6>2, <6>0 DEF check_root
                 <5>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v) 
                     BY <5>2, <2>5, Zenon DEF check_root
                 <5> QED BY <5>1, <5>2 
@@ -807,7 +815,7 @@ THEOREM NumStack == Spec => []NumStackInv
                     <6>2. /\ i \in k+1 .. Len(t_stack) => i \in 1 .. Len(t_stack') 
                           /\ j \in k+1 .. Len(t_stack) => j \in 1 .. Len(t_stack') 
                           BY <2>5, <5>1 DEF check_root
-                   <6>3. (t_stack[i] = t_stack[j] => i = j) =>  (t_stack'[i] = t_stack'[j]  => i = j)
+                    <6>3. (t_stack[i+k] = t_stack[j+k] => i+k = j+k) =>  (t_stack'[i] = t_stack'[j]  => i = j)
                           BY <2>5, <5>1, <6>0, <6>2 DEF check_root
                     <6> QED BY <5>1, <2>5, <6>2, <6>0, <6>3 DEF check_root
                 <5>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v) 
@@ -855,6 +863,7 @@ ColorInv ==
 
 THEOREM Color == Spec => []ColorInv
 <1>1. Init => ColorInv
+    BY DEF Init, ColorInv, White, Black, Gray
 <1>2. TypeOK /\ ColorInv /\ [Next]_vars => ColorInv'
   <2>. USE DEF TypeOK, ColorInv, White, Black, Gray
   <2> SUFFICES ASSUME TypeOK,
