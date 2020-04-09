@@ -949,7 +949,9 @@ THEOREM Color == Spec => []ColorInv
 <1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
 
 ---------------------------------------------------------------------------------------------
-
+(***************************************************************************)
+(* Functional invariant about relation between function and Tarjan stacks. *)
+(***************************************************************************)
 Precedes(x,y,seq) == \E i,j \in 1 .. Len(seq) : i <= j /\ seq[i] = x /\ seq[j] = y
 
 Inv ==
