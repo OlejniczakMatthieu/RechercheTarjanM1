@@ -1,7 +1,6 @@
 ------------------------------- MODULE Tarjan -------------------------------
 EXTENDS FiniteSets, Sequences, Integers, SCC, TLAPS, FiniteSetTheorems
 
-ASSUME NodesFinite == IsFiniteSet(Nodes)
 (***************************************************************************)
 (* The algorithm in pseudo-code (from Wikipedia):                          *)
 (*                                                                         *)
@@ -270,15 +269,30 @@ TypeOK ==
         \/ /\ i = Len(stack)
            /\ stack[i].pc = "main"
            /\ stack[i].v = defaultInitValue
+(*** ancienne version
+  /\ \A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
+        /\ i < Len(stack)
+        /\ stack[i].v \in Nodes /\ num[stack[i].v] \in Nat
+        /\ stack[i].w \in Nodes
+***)
   /\ \/ pc \in {"main", "Done"} /\ stack = << >>
      \/ /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
         /\ stack # << >>
+(*** ancienne version
+  /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} 
+     => /\ stack # << >> 
+        /\ Head(stack).pc = "continue_visit" => Head(stack).v \in Nodes 
+        /\ Head(stack).pc = "continue_visit" => Head(stack).w \in Nodes
+***)
   /\ succs \in SUBSET Nodes
-  /\ pc = "check_root" => succs = {}
+  /\ pc = "check_root" => succs = {}   \* ajout
   /\ v \in Nodes \cup {defaultInitValue}
   /\ \/ pc \in {"main", "Done"} /\ v = defaultInitValue
      \/ /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"}
         /\ v \in Nodes
+(*** ancienne version
+  /\ pc \in {"start_visit", "explore_succ", "visit_recurse", "continue_visit", "check_root"} => v \in Nodes
+***)
   /\ pc = "start_visit" => num[v] = -1
   /\ pc = "visit_recurse" => num[w] = -1
   /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat
@@ -286,7 +300,7 @@ TypeOK ==
   /\ w \in Nodes \cup {defaultInitValue}
 
 USE SuccsType
-USE NodesFinite
+USE IsFiniteSet(Nodes)
 
 THEOREM TypeCorrect == Spec => []TypeOK
 <1>init. Init => TypeOK
@@ -416,11 +430,10 @@ THEOREM TypeCorrect == Spec => []TypeOK
       <4>1. CASE pc' = "main"
         BY <2>5, <4>1 DEF check_root
       <4>2. CASE pc' = "continue_visit"
-        <5>1. stack # << >> /\ Len(stack) - 1 # 0
-          BY <2>5, <4>2 DEF check_root
-        <5>4. Tail(stack) # << >>
-          BY <5>1, HeadTailProperties, EmptySeq, Zenon
-        <5> QED BY <5>1, <2>5 DEF check_root
+        <5>1. stack # << >>
+            BY <2>5 DEF check_root
+        <5>2. Tail(stack) # <<>>
+        <5> QED BY <2>5, <4>2, <5>1, <5>2 DEF check_root
       <4> QED BY <2>5, <4>1, <4>2 DEF check_root
     <3>12. (succs \in SUBSET Nodes)'
       <4>1. Head(stack) \in StackEntry
@@ -459,19 +472,19 @@ THEOREM TypeCorrect == Spec => []TypeOK
         <5> QED BY <5>1, <5>2, <5>3, <5>4, <2>5 DEF check_root 
      <4> QED BY <2>5, <4>1 DEF check_root
     <3>18. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat)'
-       <4>1. pc' = Head(stack).pc 
+       <4>0. pc' = Head(stack).pc 
          BY <2>5 DEF check_root
-       <4>2. Head(stack).pc \in {"continue_visit", "main"}  
+       <4>a. Head(stack).pc \in {"continue_visit", "main"}  
         <5>1. stack # << >>
             BY <2>5 DEF check_root
         <5>2.  Head(stack) \in StackEntry
             BY <2>5 DEF check_root
         <5> QED BY <2>5, <5>1, <5>2 DEF StackEntry, check_root  
-       <4>3. pc' \in {"continue_visit", "main"} 
-         BY <2>5, <4>1, <4>2  DEF check_root, StackEntry
-       <4>4. UNCHANGED num
+       <4>1. pc' \in {"continue_visit", "main"} 
+         BY <2>5, <4>0, <4>a  DEF check_root, StackEntry
+       <4>2. UNCHANGED num
          BY <2>5 DEF check_root
-       <4> QED BY <2>5, <4>3, <4>4 DEF check_root
+       <4> QED BY <2>5, <4>1, <4>2 DEF check_root
     <3>19. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes)'
       BY <2>5 DEF check_root
     <3>20. (w \in Nodes \cup {defaultInitValue})'
@@ -806,14 +819,12 @@ THEOREM NumStack == Spec => []NumStackInv
                         BY <5>1
                     <6>0. t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
                         BY <2>5, <5>1, Zenon DEF check_root
-                    <6>2. /\ i \in k+1 .. Len(t_stack) => i \in 1 .. Len(t_stack') 
-                          /\ j \in k+1 .. Len(t_stack) => j \in 1 .. Len(t_stack') 
+                    <6>2. /\ i \in k+1 .. Len(t_stack) => i-k \in 1 .. Len(t_stack') 
+                          /\ j \in k+1 .. Len(t_stack) => j-k \in 1 .. Len(t_stack') 
                           BY <2>5, <5>1 DEF check_root
                     <6>3. (t_stack[i+k] = t_stack[j+k] => i+k = j+k) =>  (t_stack'[i] = t_stack'[j]  => i = j)
                           BY <2>5, <5>1, <6>0, <6>2 DEF check_root
-                    <6> QED
-                      <7>. HIDE DEF k
-                      <7>. QED  BY <5>1, <2>5, <6>2, <6>0, <6>3 DEF check_root
+                    <6> QED BY <5>1, <2>5, <6>2, <6>0, <6>3 DEF check_root
                 <5>2. CASE ~(lowlink[v] = num[v] /\ \E k \in 1 .. Len(t_stack) : t_stack[k] = v) 
                     BY <5>2, <2>5 DEF check_root
                 <5> QED BY <5>1, <5>2 
@@ -948,26 +959,6 @@ THEOREM Color == Spec => []ColorInv
     BY <2>1, <2>2, <2>3, <2>4, <2>5, <2>6, <2>7, <2>8 DEF Next, visit
 <1>. QED  BY <1>1, <1>2, TypeCorrect, PTL DEF Spec
 
----------------------------------------------------------------------------------------------
-
-Precedes(x,y,seq) == \E i,j \in 1 .. Len(seq) : i <= j /\ seq[i] = x /\ seq[j] = y
-
-Inv ==
-  /\ \A i \in 1 .. Len(stack)-2 : stack[i].v \in Succs[stack[i+1].v]
-  /\ Len(stack) > 1 => v \in Succs[stack[1].v]
-  /\ \A i,j \in 1 .. Len(stack)-1 : 
-        /\ i <= j <=> num[stack[j].v] <= num[stack[i].v]
-        /\ stack[i].v = stack[j].v => i = j
-  /\ \A i \in 1 .. Len(stack) : v # stack[i].v
-  /\ Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {})
-  /\ \A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack)
-  /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
-     => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack)
-  /\ \A i \in 1 .. Len(stack)-1 : lowlink[stack[i].v] <= num[stack[i].v]
-  /\ pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
-     => onStack[v] /\ lowlink[v] <= num[v]
-  /\ \A i \in 1 .. Len(t_stack) : lowlink[t_stack[i]] <= num[t_stack[i]]
-
 (*
 LowlinkInv ==
   /\ \A x \in Nodes : num[x] \in Nat => 
@@ -989,6 +980,7 @@ THEOREM StackReachability == Spec => []StackReachabilityInv
 <1>1. Init => StackReachabilityInv
 <1>2. TypeOK /\ NumStackInv /\ StackReachabilityInv /\ [Next]_vars => StackReachabilityInv'
 <1>. QED  BY TypeCorrect, NumStack, <1>1, <1>2, PTL DEF Spec
+
 
 =============================================================================
 \* Last modified Thu Mar 19 17:55:34 CET 2020 by Angela Ipseiz
