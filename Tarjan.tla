@@ -890,7 +890,7 @@ THEOREM Color == Spec => []ColorInv
   <2>2. CASE explore_succ
     BY <2>2 DEF explore_succ
   <2>3. CASE visit_recurse
-    BY <2>3 DEF visit_recurse
+    BY <2>3 DEF visit_recurse, StackEntry
   <2>4. CASE continue_visit
     BY <2>4 DEF continue_visit
   <2>5. CASE check_root
