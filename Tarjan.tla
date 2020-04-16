@@ -242,6 +242,9 @@ Termination == <>(pc = "Done")
 
 \* END TRANSLATION TLA-ca633d7928a0211fc004f869a2523ede
 
+ASSUME defaultNotNode == defaultInitValue \notin Nodes
+USE defaultNotNode
+
 Correct == pc = "Done" => sccs = SCCs
 
 StackEntry == [
@@ -970,7 +973,7 @@ Inv ==
   
 THEOREM Stacks == Spec => []Inv
 <1>1. Init => Inv
-    BY DEF Init, Inv, Precedes 
+  BY DEF Init, Inv, Gray, Precedes
 <1>2. TypeOK /\ NumStackInv /\ ColorInv /\ Inv /\ [Next]_vars => Inv'
   <2>. USE DEF TypeOK, NumStackInv, ColorInv, Black, Gray, White, Inv, Precedes
   <2> SUFFICES ASSUME TypeOK,
@@ -1077,9 +1080,39 @@ THEOREM Stacks == Spec => []Inv
               /\ stack[i].v = stack[j].v => i = j)'
       BY <2>5 DEF check_root
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
+      <4>1. v' = Head(stack).v
         BY <2>5 DEF check_root
+      <4>2. stack' = Tail(stack)
+        BY <2>5 DEF check_root
+      <4>3. \A j \in 2 .. Len(stack) : Head(stack).v # stack[j].v
+        OBVIOUS
+      <4>. QED  BY <4>1, <4>2, <4>3
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
-      BY <2>5 DEF check_root
+      <4>1. CASE lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
+        <5>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
+        <5>. k \in 1 .. Len(t_stack) /\ t_stack[k] = v
+          BY <4>1
+        <5>. HIDE DEF k
+        <5>. SUFFICES ASSUME NEW g \in Gray'
+                      PROVE  g \in Range(t_stack)'
+          OBVIOUS
+        <5>1. PICK i \in 1 .. Len(stack)-1 : stack[i].v = g
+          BY <2>5 DEF check_root, Gray
+        <5>2. Precedes(v, stack[i].v, t_stack)
+          BY <5>1, <2>5 DEF check_root
+        <5>3. PICK l \in 1 .. Len(t_stack) : t_stack[l] = stack[i].v /\ k < l
+          BY <5>2 DEF Precedes
+        <5>4. t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
+          BY <2>5, <4>1 DEF check_root, k
+        <5>5. /\ l-k \in DOMAIN t_stack'
+              /\ t_stack'[l-k] = t_stack[l]
+          BY <5>4, <5>3
+        <5>. QED  BY <5>1, <5>3, <5>5 DEF Range
+      <4>2. CASE ~(lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v))
+        <5>1. t_stack' = t_stack
+          BY <4>2, <2>5 DEF check_root
+        <5>. QED  BY <5>1, <4>2, <2>5 DEF check_root, Gray
+      <4>. QED  BY <4>1, <4>2
     <3>6. (\A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack))'
       <4> SUFFICES ASSUME NEW i \in (1 .. Len(stack)-1)', NEW j \in (1 .. Len(stack)-1)',
                           (i <= j)'
