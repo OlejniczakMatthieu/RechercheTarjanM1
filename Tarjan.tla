@@ -995,43 +995,153 @@ THEOREM Stacks == Spec => []Inv
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
       BY <2>1 DEF start_visit
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
-      BY <2>1 DEF start_visit
+        <4>1. v' \notin Gray
+            BY <2>1 DEF start_visit
+        <4> QED BY <2>1, <4>1 DEF start_visit
     <3>6. (\A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack))'
-      BY <2>1 DEF start_visit
+      <4> SUFFICES ASSUME NEW i \in (1 .. Len(stack)-1)', NEW j \in (1 .. Len(stack)-1)',
+                          (i <= j)'
+                   PROVE  Precedes(stack[i].v, stack[j].v, t_stack)'
+        OBVIOUS
+      <4>0. t_stack' = <<v>> \o t_stack
+      <4>1. UNCHANGED stack
+      <4>2. /\ i \in 1 .. Len(stack') => i \in 1 .. Len(stack)
+            /\ j \in 1 .. Len(stack') => j \in 1 .. Len(stack)
+      <4>3. ASSUME NEW k \in 1 .. Len(t_stack), NEW l \in 1 .. Len(t_stack)
+                    PROVE /\ k \in 1 .. Len(t_stack) => k \in 2 .. Len(t_stack')
+                          /\ l \in 1 .. Len(t_stack) => l \in 2 .. Len(t_stack')
+        <5>1. k \in 1 .. Len(t_stack) => k \in 2 .. Len(t_stack')
+          BY <2>1, <4>0, <4>1, <4>2 DEF start_visit
+        <5>2. l \in 1 .. Len(t_stack) => l \in 2 .. Len(t_stack')
+          BY <2>1, <4>0, <4>1, <4>2 DEF start_visit
+        <5>3. QED
+          BY <5>1, <5>2
+            
+      <4> QED
+        BY <2>1, <4>1, <4>2, <4>3 DEF start_visit
     <3>7. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack))'
-      BY <2>1 DEF start_visit
+      <4>1. t_stack' = <<v>> \o t_stack
+        BY <2>1 DEF start_visit
+      <4> QED BY <2>1, <4>1 DEF start_visit
     <3>8. (\A i \in 1 .. Len(stack)-1 : lowlink[stack[i].v] <= num[stack[i].v])'
       BY <2>1 DEF start_visit
     <3>9. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => onStack[v] /\ lowlink[v] <= num[v])'
-      BY <2>1 DEF start_visit
+      <4>1. onStack'[v] = TRUE
+        BY <2>1 DEF start_visit
+      <4>2. lowlink'[v] = index /\ num'[v] = index
+        BY <2>1 DEF start_visit
+      <4>3. UNCHANGED v
+        BY <2>1 DEF start_visit
+      <4> QED BY <2>1, <4>1, <4>2, <4>3 DEF start_visit
     <3>10. (\A i \in 1 .. Len(t_stack) : lowlink[t_stack[i]] <= num[t_stack[i]])'
-      BY <2>1 DEF start_visit
+      <4>1. t_stack' = <<v>> \o t_stack
+        BY <2>1 DEF start_visit
+      <4>2. lowlink'[v] = num'[v]
+        BY <2>1 DEF start_visit
+      <4> QED BY <2>1, <4>1, <4>2 DEF start_visit
     <3>11. QED
       BY <3>1, <3>10, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9 
   <2>2. CASE explore_succ
-    BY <2>2 DEF explore_succ
+    <3>1. (\A i \in 1 .. Len(stack)-2 : stack[i].v \in Succs[stack[i+1].v])'
+      BY <2>2 DEF explore_succ
+    <3>2. (Len(stack) > 1 => v \in Succs[stack[1].v])'
+      BY <2>2 DEF explore_succ
+    <3>3. (\A i,j \in 1 .. Len(stack)-1 : 
+              /\ i <= j <=> num[stack[j].v] <= num[stack[i].v]
+              /\ stack[i].v = stack[j].v => i = j)'
+      BY <2>2 DEF explore_succ
+    <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
+      BY <2>2 DEF explore_succ
+    <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
+      BY <2>2 DEF explore_succ
+    <3>6. (\A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack))'
+      <4> SUFFICES ASSUME NEW i \in (1 .. Len(stack)-1)', NEW j \in (1 .. Len(stack)-1)',
+                          (i <= j)'
+                   PROVE  Precedes(stack[i].v, stack[j].v, t_stack)'
+        OBVIOUS
+      <4> QED
+        BY <2>2 DEF explore_succ
+      
+    <3>7. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
+           => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack))'
+      <4>1. UNCHANGED <<v, stack, t_stack>>
+        BY <2>2 DEF explore_succ
+      <4> QED BY <2>2, <4>1 DEF explore_succ
+    <3>8. (\A i \in 1 .. Len(stack)-1 : lowlink[stack[i].v] <= num[stack[i].v])'
+      BY <2>2 DEF explore_succ
+    <3>9. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
+           => onStack[v] /\ lowlink[v] <= num[v])'
+      BY <2>2 DEF explore_succ
+    <3>10. (\A i \in 1 .. Len(t_stack) : lowlink[t_stack[i]] <= num[t_stack[i]])'
+      <4>1. CASE succs # {}
+        <5>1. CASE num[w'] = -1
+            <6>1. CASE num[w'] < lowlink[v]
+                BY <2>2, <4>1, <5>1, <6>1 DEF explore_succ
+            <6>2. CASE  ~(num[w'] < lowlink[v])
+                BY <2>2, <4>1, <5>1, <6>2 DEF explore_succ
+            <6> QED BY <6>1, <6>2, <2>2, <4>1, <5>1 DEF explore_succ
+        <5>2. CASE num[w'] # -1
+            BY <2>2, <4>1, <5>2 DEF explore_succ
+        <5> QED BY <2>2, <4>1, <5>1, <5>2 DEF explore_succ
+      <4>2. CASE succs = {}
+        BY <2>2, <4>2 DEF explore_succ
+      <4> QED BY <2>2, <4>1, <4>2 DEF explore_succ
+    <3>11. QED
+      BY <3>1, <3>10, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9 DEF Inv
+    
   <2>3. CASE visit_recurse
     <3>1. (\A i \in 1 .. Len(stack)-2 : stack[i].v \in Succs[stack[i+1].v])'
       BY <2>3 DEF visit_recurse
     <3>2. (Len(stack) > 1 => v \in Succs[stack[1].v])'
-      BY <2>3 DEF visit_recurse
+      <4>1. w \in Succs[v]
+        BY <2>3 DEF visit_recurse
+      <4> QED BY <2>3, <4>1 DEF visit_recurse
     <3>3. (\A i,j \in 1 .. Len(stack)-1 : 
               /\ i <= j <=> num[stack[j].v] <= num[stack[i].v]
               /\ stack[i].v = stack[j].v => i = j)'
-      BY <2>3 DEF visit_recurse
+      <4> SUFFICES ASSUME NEW i \in (1 .. Len(stack)-1)', NEW j \in (1 .. Len(stack)-1)'
+                   PROVE  (/\ i <= j <=> num[stack[j].v] <= num[stack[i].v]
+                           /\ stack[i].v = stack[j].v => i = j)'
+        OBVIOUS
+      <4>1. (i <= j <=> num[stack[j].v] <= num[stack[i].v])'
+        BY <2>3 DEF visit_recurse
+      <4>2. (stack[i].v = stack[j].v => i = j)'
+        BY <2>3 DEF visit_recurse
+      <4>3. QED
+        BY <4>1, <4>2
+      
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
-      BY <2>3 DEF visit_recurse
+      <4>1. \A i \in 2 .. Len(stack) : v # stack[i].v
+        BY <2>3 DEF visit_recurse
+      <4>2. v # w
+        BY <2>3 DEF visit_recurse 
+      <4> QED BY <2>3, <4>1, <4>2 DEF visit_recurse
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
       BY <2>3 DEF visit_recurse
     <3>6. (\A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack))'
-      BY <2>3 DEF visit_recurse
+      <4>1. (\A k \in 1 .. Len(stack)-1 : Precedes(v, stack[k].v, t_stack)) => (\E l \in 1 .. Len(t_stack) : t_stack[l] = v)
+        BY <2>3 DEF visit_recurse
+     <4>2. \A i,j \in 1 .. Len(stack)-1 : i \in 2 .. Len(stack')-1 /\ j \in 2 .. Len(stack')-1
+        <5> SUFFICES ASSUME NEW i \in 1 .. Len(stack)-1, NEW j \in 1 .. Len(stack)-1
+                     PROVE  i \in 2 .. Len(stack')-1 /\ j \in 2 .. Len(stack')-1
+          OBVIOUS
+        <5>1. i \in 1 .. Len(stack')-2
+            BY <2>3, HeadTailProperties DEF visit_recurse, StackEntry
+        <5>2. j \in 2 .. Len(stack')-1
+            BY <2>3 DEF visit_recurse
+        <5>3. QED
+          BY <5>1, <5>2
+      <4>3. stack'[1].v = v
+        BY <2>3 DEF visit_recurse
+      <4> QED
+        BY <2>3, <4>1, <4>2, <4>3 DEF visit_recurse, StackEntry
+      
     <3>7. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack))'
       BY <2>3 DEF visit_recurse
     <3>8. (\A i \in 1 .. Len(stack)-1 : lowlink[stack[i].v] <= num[stack[i].v])'
-      BY <2>3 DEF visit_recurse
     <3>9. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => onStack[v] /\ lowlink[v] <= num[v])'
       BY <2>3 DEF visit_recurse
@@ -1054,12 +1164,12 @@ THEOREM Stacks == Spec => []Inv
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
       BY <2>4 DEF continue_visit
     <3>6. (\A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack))'
-      
         BY <2>4 DEF continue_visit
-      
     <3>7. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack))'
-      BY <2>4 DEF continue_visit
+      <4>1. UNCHANGED <<v, stack, t_stack>>
+        BY <2>4 DEF continue_visit
+      <4> QED BY <2>4, <4>1 DEF continue_visit
     <3>8. (\A i \in 1 .. Len(stack)-1 : lowlink[stack[i].v] <= num[stack[i].v])'
       BY <2>4 DEF continue_visit
     <3>9. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
@@ -1143,7 +1253,6 @@ THEOREM Stacks == Spec => []Inv
         <5>. k \in 1 .. Len(t_stack)
             BY <2>5 DEF check_root
         <5>1. UNCHANGED <<num, lowlink>>
-        \*<5>2. ????? 
         <5> QED BY <2>5, <4>1, <5>1, HeadTailProperties DEF check_root
       <4>2. CASE ~(lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v))
         <5>1. UNCHANGED <<onStack, num, lowlink>>
@@ -1173,25 +1282,33 @@ THEOREM Stacks == Spec => []Inv
       BY <3>1, <3>10, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9 DEF Inv
     
   <2>6. CASE main
+    <3>a. CASE /\ stack' =  <<[procedure |-> "visit",
+                                        pc |-> "main", succs |-> succs,
+                                            w |-> w, v |-> v]>>
+                                         \o stack 
+                 /\ UNCHANGED num
+        BY <3>a, <2>6 DEF main
+    <3>b. CASE UNCHANGED <<stack, num>>
+        BY <2>6, <3>b DEF main
     <3>1. (\A i \in 1 .. Len(stack)-2 : stack[i].v \in Succs[stack[i+1].v])'
-      BY <2>6 DEF main
+        BY <3>a, <3>b, <2>6 DEF main
     <3>2. (Len(stack) > 1 => v \in Succs[stack[1].v])'
-      BY <2>6 DEF main
+        BY <3>a, <3>b, <2>6 DEF main
     <3>3. (\A i,j \in 1 .. Len(stack)-1 : 
               /\ i <= j <=> num[stack[j].v] <= num[stack[i].v]
               /\ stack[i].v = stack[j].v => i = j)'
-      BY <2>6 DEF main
+        BY <3>a, <3>b, <2>6 DEF main
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
-      BY <2>6 DEF main
+        BY <3>a, <3>b, <2>6 DEF main
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
-      BY <2>6 DEF main
+        BY <3>a, <3>b, <2>6 DEF main
     <3>6. (\A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack))'
-      BY <2>6 DEF main
+        BY <3>a, <3>b, <2>6 DEF main
     <3>7. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack))'
       BY <2>6 DEF main
     <3>8. (\A i \in 1 .. Len(stack)-1 : lowlink[stack[i].v] <= num[stack[i].v])'
-      BY <2>6 DEF main
+        BY <3>a, <3>b, <2>6 DEF main
     <3>9. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => onStack[v] /\ lowlink[v] <= num[v])'
       BY <2>6 DEF main
