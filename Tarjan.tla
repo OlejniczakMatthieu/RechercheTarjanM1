@@ -1333,18 +1333,24 @@ THEOREM Stacks == Spec => []Inv
     
 <1> QED BY <1>1, <1>2, TypeCorrect, NumStack, Color, PTL DEF Spec
 
-(*
-LowlinkInv ==
-  /\ \A x \in Nodes : num[x] \in Nat => 
-        /\ lowlink[x] <= num[x]
-        /\ \E y \in Nodes : num[y] = lowlink[x] /\ <<x,y>> \in Connected
-  /\ v \in Nodes => 
-      \A x \in Succs[v] \ succs :
-        /\ \/ pc \in {"explore_succ", "visit_recurse", "check_root"}
-           \/ pc = "continue_visit" /\ x # w
-        /\ onStack[x]
-        => lowlink[v] <= lowlink[x]
-*)
+LEMMA StackConnected ==
+  ASSUME TypeOK, Inv,
+         NEW i \in 1 .. Len(stack)-1, NEW j \in 1 .. Len(stack)-1, i <= j
+  PROVE  <<stack[j].v, stack[i].v>> \in Connected
+
+LEMMA VConnected ==
+  ASSUME TypeOK, Inv,
+         Len(stack) > 1, NEW i \in 1 .. Len(stack)-1
+  PROVE  <<stack[i].v, v>> \in Connected
+
+LowlinkInv == 
+  /\ \A x \in Nodes \ White : 
+        /\ lowlink[x] # -1
+        /\ \E y \in Nodes : /\ lowlink[x] = num[y]
+                            /\ <<x,y>> \in Connected
+                            /\ onStack[x] => onStack[y]
+  /\ pc = "continue_visit" /\ lowlink[w] < lowlink[v] => onStack[w]
+  /\ \A i \in 1 .. Len(stack)-1 : i#1 \/ pc # "start_visit" => onStack[stack[i].w]
 
 StackReachabilityInv ==
   /\ \A x,y \in Nodes : onStack[x] /\ onStack[y] /\ num[x] <= num[y] => <<x,y>> \in Connected
