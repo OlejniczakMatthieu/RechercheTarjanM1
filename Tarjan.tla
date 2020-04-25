@@ -329,7 +329,8 @@ THEOREM TypeCorrect == Spec => []TypeOK
                \/ /\ i < Len(stack)
                   /\ stack[i].pc = "continue_visit"
                   /\ stack[i].v \in Nodes /\ num[stack[i].v] \in Nat
-                  /\ stack[i].w \in Nodes
+                  /\ stack[i].succs \subseteq Succs[stack[i].v]
+                  /\ stack[i].w \in Nodes /\ stack[i].w \in Succs[stack[i].v]
                \/ /\ i = Len(stack)
                   /\ stack[i].pc = "main"
                   /\ stack[i].v = defaultInitValue)'
@@ -339,6 +340,8 @@ THEOREM TypeCorrect == Spec => []TypeOK
                /\ stack # << >>)'
       BY <2>3 DEF visit_recurse
     <3>12. (succs \in SUBSET Nodes)'
+      BY <2>3 DEF visit_recurse
+    <3>a. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => succs \subseteq Succs[v])'
       BY <2>3 DEF visit_recurse
     <3>13. (pc = "check_root" => succs = {})'
       BY <2>3 DEF visit_recurse
@@ -358,12 +361,12 @@ THEOREM TypeCorrect == Spec => []TypeOK
       BY <2>3 DEF visit_recurse
     <3>18. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat)'
       BY <2>3 DEF visit_recurse
-    <3>19. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes)'
+    <3>19. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes /\ w \in Succs[v])'
       BY <2>3 DEF visit_recurse
     <3>20. (w \in Nodes \cup {defaultInitValue})'
       BY <2>3 DEF visit_recurse
     <3>. QED BY <3>1, <3>2, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9, <3>10,
-           <3>11, <3>12, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19, <3>20
+           <3>11, <3>12, <3>a, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19, <3>20
   <2>4. CASE continue_visit
     BY <2>4 DEF continue_visit
   <2>5. CASE check_root
@@ -410,7 +413,8 @@ THEOREM TypeCorrect == Spec => []TypeOK
                \/ /\ i < Len(stack)
                   /\ stack[i].pc = "continue_visit"
                   /\ stack[i].v \in Nodes /\ num[stack[i].v] \in Nat
-                  /\ stack[i].w \in Nodes
+                  /\ stack[i].succs \subseteq Succs[stack[i].v]
+                  /\ stack[i].w \in Nodes /\ stack[i].w \in Succs[stack[i].v]
                \/ /\ i = Len(stack)
                   /\ stack[i].pc = "main"
                   /\ stack[i].v = defaultInitValue)'
@@ -425,12 +429,14 @@ THEOREM TypeCorrect == Spec => []TypeOK
           BY <2>5, <4>2 DEF check_root
         <5>4. Tail(stack) # << >>
           BY <5>1, HeadTailProperties, EmptySeq, Zenon
-        <5> QED BY <5>1, <2>5 DEF check_root
+        <5> QED BY <5>1, <5>4, <4>2, <2>5 DEF check_root
       <4> QED BY <2>5, <4>1, <4>2 DEF check_root
     <3>12. (succs \in SUBSET Nodes)'
       <4>1. Head(stack) \in StackEntry
         BY <2>5 DEF check_root           
       <4>. QED  BY <4>1, <2>5 DEF StackEntry, check_root 
+    <3>a. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => succs \subseteq Succs[v])'
+      BY <2>5 DEF check_root
     <3>13. (pc = "check_root" => succs = {})'
       BY <2>5 DEF check_root
     <3>14. (v \in Nodes \cup {defaultInitValue})'
@@ -477,14 +483,14 @@ THEOREM TypeCorrect == Spec => []TypeOK
        <4>4. UNCHANGED num
          BY <2>5 DEF check_root
        <4> QED BY <2>5, <4>3, <4>4 DEF check_root
-    <3>19. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes)'
+    <3>19. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes /\ w \in Succs[v])'
       BY <2>5 DEF check_root
     <3>20. (w \in Nodes \cup {defaultInitValue})'
       <4>1. Head(stack) \in StackEntry
         BY <2>5 DEF check_root
       <4>. QED  BY <4>1, <2>5 DEF StackEntry, check_root 
     <3>21. QED
-      BY <3>1, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19, <3>2, <3>20, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9
+      BY <3>1, <3>10, <3>11, <3>12, <3>a, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19, <3>2, <3>20, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9
    
   <2>6. CASE main
     <3>1. (index \in Nat)'
@@ -516,7 +522,8 @@ THEOREM TypeCorrect == Spec => []TypeOK
                \/ /\ i < Len(stack)
                   /\ stack[i].pc = "continue_visit"
                   /\ stack[i].v \in Nodes /\ num[stack[i].v] \in Nat
-                  /\ stack[i].w \in Nodes
+                  /\ stack[i].succs \subseteq Succs[stack[i].v]
+                  /\ stack[i].w \in Nodes /\ stack[i].w \in Succs[stack[i].v]
                \/ /\ i = Len(stack)
                   /\ stack[i].pc = "main"
                   /\ stack[i].v = defaultInitValue)'
@@ -535,6 +542,8 @@ THEOREM TypeCorrect == Spec => []TypeOK
       BY <2>6 DEF main
     <3>12. (succs \in SUBSET Nodes)'
       BY <2>6 DEF main
+    <3>a. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => succs \subseteq Succs[v])'
+        BY <2>6 DEF main
     <3>13. (pc = "check_root" => succs = {})'
       BY <2>6 DEF main
     <3>14. (v \in Nodes \cup {defaultInitValue})'
@@ -549,12 +558,12 @@ THEOREM TypeCorrect == Spec => []TypeOK
       BY <2>6 DEF main
     <3>18. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"} => num[v] \in Nat)'
       BY <2>6 DEF main
-    <3>19. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes)'
+    <3>19. (pc \in {"visit_recurse", "continue_visit"} => w \in Nodes /\ w \in Succs[v])'
       BY <2>6 DEF main
     <3>20. (w \in Nodes \cup {defaultInitValue})'
       BY <2>6 DEF main
     <3>21. QED
-      BY <3>1, <3>10, <3>11, <3>12, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19, <3>2, <3>20, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9 
+      BY <3>1, <3>10, <3>11, <3>12, <3>a, <3>13, <3>14, <3>15, <3>16, <3>17, <3>18, <3>19, <3>2, <3>20, <3>3, <3>4, <3>5, <3>6, <3>7, <3>8, <3>9 
     
   <2>7. CASE Terminating
     BY <2>7 DEF vars, Terminating
@@ -762,7 +771,7 @@ THEOREM NumStack == Spec => []NumStackInv
                         <8>1. ~(\E i \in 1 .. k : t_stack[i] = n) 
                             BY <7>2, <5>b, <2>5 DEF check_root
                         <8>2. ~(n \in {t_stack[i] : i \in 1 .. k})
-                            BY <5>b, <8>1, <2>5, <7>1 DEF check_root
+                            BY <5>b, <4>1, <8>1, <2>5, <7>1 DEF check_root
                         <8> QED BY <8>1, <8>2, Zenon
                     <7>4. ~(num[n] \in Nat) 
                         BY <5>b, <2>5 DEF check_root 
@@ -998,7 +1007,9 @@ THEOREM Stacks == Spec => []Inv
               /\ stack[i].v = stack[j].v => i = j)'
       BY <2>1 DEF start_visit
     <3>a. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
+        BY <2>1 DEF start_visit
     <3>b. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
+        BY <2>1 DEF start_visit
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
       BY <2>1 DEF start_visit
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
@@ -1065,7 +1076,9 @@ THEOREM Stacks == Spec => []Inv
               /\ stack[i].v = stack[j].v => i = j)'
       BY <2>2 DEF explore_succ
     <3>a. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
+      BY <2>2 DEF explore_succ
     <3>b. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
+      BY <2>2 DEF explore_succ 
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
       BY <2>2 DEF explore_succ
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
@@ -1116,7 +1129,9 @@ THEOREM Stacks == Spec => []Inv
       <4>3. QED
         BY <4>1, <4>2
     <3>a. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
+      BY <2>3 DEF visit_recurse
     <3>b. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
+      BY <2>3 DEF visit_recurse
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
       <4>1. \A i \in 2 .. Len(stack) : v # stack[i].v
         BY <2>3 DEF visit_recurse
@@ -1159,7 +1174,9 @@ THEOREM Stacks == Spec => []Inv
               /\ stack[i].v = stack[j].v => i = j)'
       BY <2>4 DEF continue_visit
     <3>a. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
+      BY <2>4 DEF continue_visit
     <3>b. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
+      BY <2>4 DEF continue_visit
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
       BY <2>4 DEF continue_visit
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
@@ -1191,8 +1208,10 @@ THEOREM Stacks == Spec => []Inv
               /\ stack[i].v = stack[j].v => i = j)'
       BY <2>5 DEF check_root
     <3>a. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
+       BY <2>5 DEF check_root
     <3>b. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
+       BY <2>5 DEF check_root
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
       <4>1. v' = Head(stack).v
         BY <2>5 DEF check_root
@@ -1303,8 +1322,10 @@ THEOREM Stacks == Spec => []Inv
               /\ stack[i].v = stack[j].v => i = j)'
         BY <3>a, <3>b, <2>6 DEF main
     <3>x. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
+        BY <2>6 DEF main
     <3>y. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
+       BY <2>6 DEF main
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
         BY <3>a, <3>b, <2>6 DEF main
     <3>5. (Gray \subseteq Range(t_stack) \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
