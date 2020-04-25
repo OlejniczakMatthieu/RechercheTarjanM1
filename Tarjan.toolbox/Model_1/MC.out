@@ -1,0 +1,641 @@
+@!@!@STARTMSG 2262:0 @!@!@
+TLC2 Version 2.14 of 10 July 2019
+@!@!@ENDMSG 2262 @!@!@
+@!@!@STARTMSG 2187:0 @!@!@
+Running breadth-first search Model-Checking with fp 6 and seed 2677146061688638448 with 2 workers on 4 cores with 608MB heap and 1365MB offheap memory [pid: 86724] (Mac OS X 10.14.6 x86_64, AdoptOpenJDK 11.0.3 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+@!@!@ENDMSG 2187 @!@!@
+@!@!@STARTMSG 2220:0 @!@!@
+Starting SANY...
+@!@!@ENDMSG 2220 @!@!@
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/MC.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/Tarjan.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201907102009/tla2sany/StandardModules/TLC.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/FiniteSets.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201907102009/tla2sany/StandardModules/Sequences.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201907102009/tla2sany/StandardModules/Integers.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/SCC.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/TLAPS.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/FiniteSetTheorems.tla
+Parsing file /Applications/TLA+ Toolbox.app/Contents/Eclipse/plugins/org.lamport.tlatools_1.0.0.201907102009/tla2sany/StandardModules/Naturals.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/NaturalsInduction.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/SequenceTheorems.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/Functions.tla
+Parsing file /Users/merz/projects/stages/2019/RechercheTarjanM1/Tarjan.toolbox/Model_1/WellFoundedInduction.tla
+Semantic processing of module Naturals
+Semantic processing of module Sequences
+Semantic processing of module FiniteSets
+Semantic processing of module Integers
+Semantic processing of module NaturalsInduction
+Semantic processing of module Functions
+Semantic processing of module SequenceTheorems
+Semantic processing of module TLAPS
+Semantic processing of module SCC
+Semantic processing of module WellFoundedInduction
+Semantic processing of module FiniteSetTheorems
+Semantic processing of module Tarjan
+Semantic processing of module TLC
+Semantic processing of module MC
+@!@!@STARTMSG 2219:0 @!@!@
+SANY finished.
+@!@!@ENDMSG 2219 @!@!@
+@!@!@STARTMSG 2185:0 @!@!@
+Starting... (2020-04-23 15:32:26)
+@!@!@ENDMSG 2185 @!@!@
+@!@!@STARTMSG 2189:0 @!@!@
+Computing initial states...
+@!@!@ENDMSG 2189 @!@!@
+@!@!@STARTMSG 2190:0 @!@!@
+Finished computing initial states: 1 distinct state generated at 2020-04-23 15:32:29.
+@!@!@ENDMSG 2190 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(27) at 2020-04-23 15:32:32: 4,214 states generated (4,214 s/min), 4,134 distinct states found (4,134 ds/min), 737 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2193:0 @!@!@
+Model checking completed. No error has been found.
+  Estimates of the probability that TLC did not check all reachable states
+  because two distinct states had the same fingerprint:
+  calculated (optimistic):  val = 2.5E-9
+  based on the actual fingerprints:  val = 1.9E-9
+@!@!@ENDMSG 2193 @!@!@
+@!@!@STARTMSG 2201:0 @!@!@
+The coverage statistics at 2020-04-23 15:33:09
+@!@!@ENDMSG 2201 @!@!@
+@!@!@STARTMSG 2773:0 @!@!@
+<Init line 124, col 1 to line 124, col 4 of module Tarjan>: 1:1
+@!@!@ENDMSG 2773 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 125, col 9 to line 137, col 22 of module Tarjan: 1
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<start_visit line 139, col 1 to line 139, col 11 of module Tarjan>: 14096:14096
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 139, col 19 to line 139, col 36 of module Tarjan: 202742
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 139, col 19 to line 139, col 20 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 140, col 19 to line 140, col 50 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 141, col 19 to line 141, col 58 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 142, col 19 to line 142, col 34 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 143, col 19 to line 143, col 45 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 144, col 19 to line 144, col 57 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 145, col 19 to line 145, col 35 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 146, col 19 to line 146, col 38 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 147, col 19 to line 147, col 60 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<explore_succ line 149, col 1 to line 149, col 12 of module Tarjan>: 60133:69554
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 149, col 20 to line 149, col 38 of module Tarjan: 243197
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 149, col 20 to line 149, col 21 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 150, col 23 to line 150, col 32 of module Tarjan: 54551
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 152, col 33 to line 153, col 55 of module Tarjan: 49411
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 151, col 40 to line 151, col 44 of module Tarjan: 34408
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 154, col 34 to line 154, col 45 of module Tarjan: 49411
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 155, col 42 to line 155, col 62 of module Tarjan: 16444
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 156, col 42 to line 156, col 58 of module Tarjan: 16444
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 157, col 45 to line 157, col 55 of module Tarjan: 32967
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 158, col 56 to line 158, col 75 of module Tarjan: 16450
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 159, col 61 to line 159, col 105 of module Tarjan: 11904
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 160, col 64 to line 160, col 67 of module Tarjan: 4546
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 161, col 64 to line 161, col 80 of module Tarjan: 4546
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 162, col 53 to line 162, col 56 of module Tarjan: 16517
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 163, col 53 to line 163, col 69 of module Tarjan: 16517
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 164, col 42 to line 164, col 61 of module Tarjan: 32967
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 165, col 31 to line 165, col 48 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 166, col 31 to line 166, col 63 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 167, col 20 to line 168, col 43 of module Tarjan: 69554
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<visit_recurse line 170, col 1 to line 170, col 13 of module Tarjan>: 13849:13849
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 170, col 21 to line 170, col 40 of module Tarjan: 202495
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 170, col 21 to line 170, col 22 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 171, col 21 to line 177, col 29 of module Tarjan: 13849
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 178, col 21 to line 178, col 31 of module Tarjan: 13849
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 179, col 21 to line 179, col 41 of module Tarjan: 13849
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 180, col 21 to line 180, col 39 of module Tarjan: 13849
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 181, col 21 to line 182, col 43 of module Tarjan: 13849
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<continue_visit line 184, col 1 to line 184, col 14 of module Tarjan>: 14314:14314
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 184, col 22 to line 184, col 42 of module Tarjan: 202960
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 184, col 22 to line 184, col 23 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 185, col 25 to line 185, col 47 of module Tarjan: 14314
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 186, col 30 to line 186, col 77 of module Tarjan: 10525
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 187, col 33 to line 187, col 36 of module Tarjan: 3789
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 188, col 33 to line 188, col 49 of module Tarjan: 3789
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 189, col 22 to line 189, col 41 of module Tarjan: 14314
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 190, col 22 to line 191, col 55 of module Tarjan: 14314
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<check_root line 193, col 1 to line 193, col 10 of module Tarjan>: 14609:20143
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 193, col 18 to line 193, col 34 of module Tarjan: 208789
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 193, col 18 to line 193, col 19 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 194, col 21 to line 194, col 88 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 194, col 21 to line 194, col 39 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 194, col 45 to line 194, col 87 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 194, col 74 to line 194, col 87 of module Tarjan: 7191
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 194, col 54 to line 194, col 70 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 196, col 34 to line 196, col 82 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 196, col 43 to line 196, col 81 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 196, col 43 to line 196, col 46 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  ||line 196, col 53 to line 196, col 81 of module Tarjan: 2557:57146
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2775:0 @!@!@
+  |||line 196, col 54 to line 196, col 80 of module Tarjan: 2557:863485
+@!@!@ENDMSG 2775 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 196, col 55 to line 196, col 64 of module Tarjan: 7191
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 196, col 74 to line 196, col 79 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 196, col 79 to line 196, col 79 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 195, col 38 to line 195, col 84 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 195, col 71 to line 195, col 84 of module Tarjan: 7191
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||||line 195, col 51 to line 195, col 67 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 197, col 34 to line 198, col 77 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 199, col 34 to line 199, col 78 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 199, col 45 to line 199, col 78 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 199, col 52 to line 199, col 58 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 199, col 61 to line 199, col 63 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 199, col 61 to line 199, col 61 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 195, col 38 to line 195, col 84 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 195, col 71 to line 195, col 84 of module Tarjan: 7191
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 195, col 51 to line 195, col 67 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 199, col 66 to line 199, col 77 of module Tarjan: 2557
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 200, col 29 to line 200, col 32 of module Tarjan: 17586
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 201, col 29 to line 201, col 66 of module Tarjan: 17586
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 202, col 18 to line 202, col 37 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 203, col 18 to line 203, col 43 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 204, col 18 to line 204, col 35 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 205, col 18 to line 205, col 35 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 206, col 18 to line 206, col 37 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 207, col 18 to line 207, col 61 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<main line 212, col 1 to line 212, col 4 of module Tarjan>: 71644:302338
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 212, col 12 to line 212, col 22 of module Tarjan: 260108
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 212, col 12 to line 212, col 13 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 213, col 15 to line 213, col 26 of module Tarjan: 71462
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 215, col 28 to line 215, col 51 of module Tarjan: 302107
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 216, col 31 to line 216, col 41 of module Tarjan: 302107
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 217, col 36 to line 226, col 57 of module Tarjan: 247
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 227, col 39 to line 227, col 50 of module Tarjan: 301860
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 228, col 39 to line 228, col 72 of module Tarjan: 301860
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 214, col 32 to line 214, col 38 of module Tarjan: 71231
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 229, col 23 to line 229, col 34 of module Tarjan: 231
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 230, col 23 to line 230, col 65 of module Tarjan: 231
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 231, col 12 to line 231, col 70 of module Tarjan: 302338
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2772:0 @!@!@
+<Terminating line 234, col 1 to line 234, col 11 of module Tarjan>: 0:231
+@!@!@ENDMSG 2772 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 234, col 16 to line 234, col 26 of module Tarjan: 188877
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 234, col 16 to line 234, col 17 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 234, col 31 to line 234, col 44 of module Tarjan: 231
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2774:0 @!@!@
+<TypeOK line 258, col 1 to line 258, col 6 of module Tarjan>
+@!@!@ENDMSG 2774 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 259, col 3 to line 291, col 40 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 259, col 6 to line 259, col 18 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 260, col 6 to line 260, col 27 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 261, col 6 to line 261, col 37 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 262, col 6 to line 262, col 41 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 263, col 6 to line 263, col 35 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 264, col 6 to line 264, col 33 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 265, col 6 to line 265, col 29 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 266, col 6 to line 266, col 108 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 267, col 6 to line 267, col 30 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 268, col 6 to line 276, col 43 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 269, col 9 to line 276, col 43 of module Tarjan: 486800
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 269, col 12 to line 273, col 70 of module Tarjan: 486800
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 269, col 15 to line 269, col 28 of module Tarjan: 486800
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 270, col 15 to line 270, col 44 of module Tarjan: 369847
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 271, col 15 to line 271, col 61 of module Tarjan: 369847
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 272, col 15 to line 272, col 56 of module Tarjan: 369847
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 273, col 15 to line 273, col 70 of module Tarjan: 369847
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 274, col 12 to line 276, col 43 of module Tarjan: 116953
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 268, col 15 to line 268, col 29 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 277, col 6 to line 279, col 24 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 277, col 9 to line 277, col 48 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 277, col 9 to line 277, col 31 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 277, col 36 to line 277, col 48 of module Tarjan: 71693
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 278, col 9 to line 279, col 24 of module Tarjan: 116953
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 280, col 6 to line 280, col 27 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 281, col 6 to line 281, col 105 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 281, col 6 to line 281, col 77 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 281, col 82 to line 281, col 105 of module Tarjan: 102857
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 282, col 6 to line 282, col 36 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 282, col 6 to line 282, col 22 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 282, col 27 to line 282, col 36 of module Tarjan: 20143
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 283, col 6 to line 283, col 40 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 284, col 6 to line 286, col 22 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 284, col 9 to line 284, col 55 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 284, col 9 to line 284, col 31 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 284, col 36 to line 284, col 55 of module Tarjan: 71693
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 285, col 9 to line 286, col 22 of module Tarjan: 116953
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 287, col 6 to line 287, col 38 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 287, col 6 to line 287, col 23 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 287, col 28 to line 287, col 38 of module Tarjan: 14096
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 288, col 6 to line 288, col 40 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 288, col 6 to line 288, col 25 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 288, col 30 to line 288, col 40 of module Tarjan: 13849
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 289, col 6 to line 289, col 95 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 289, col 6 to line 289, col 77 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 289, col 82 to line 289, col 95 of module Tarjan: 102857
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 290, col 6 to line 290, col 80 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 290, col 6 to line 290, col 47 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 290, col 52 to line 290, col 80 of module Tarjan: 28163
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 291, col 6 to line 291, col 40 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2774:0 @!@!@
+<LowlinkInv line 1336, col 1 to line 1336, col 10 of module Tarjan>
+@!@!@ENDMSG 2774 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  line 1337, col 3 to line 1343, col 82 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 1337, col 6 to line 1341, col 55 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 1338, col 9 to line 1341, col 55 of module Tarjan: 1764851
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1338, col 12 to line 1338, col 26 of module Tarjan: 1764851
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1339, col 12 to line 1341, col 55 of module Tarjan: 1764851
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 1339, col 29 to line 1341, col 55 of module Tarjan: 8835792
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 1339, col 32 to line 1339, col 50 of module Tarjan: 8835792
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 1340, col 32 to line 1340, col 52 of module Tarjan: 1764851
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 1341, col 32 to line 1341, col 55 of module Tarjan: 1764851
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 1341, col 32 to line 1341, col 41 of module Tarjan: 1764851
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||||line 1341, col 46 to line 1341, col 55 of module Tarjan: 621382
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 1339, col 21 to line 1339, col 25 of module Tarjan: 1764851
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 1337, col 15 to line 1337, col 27 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1337, col 15 to line 1337, col 19 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1337, col 23 to line 1337, col 27 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 848, col 10 to line 848, col 42 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 848, col 25 to line 848, col 41 of module Tarjan: 1886460
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||||line 848, col 17 to line 848, col 21 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 1342, col 6 to line 1342, col 67 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 1342, col 6 to line 1342, col 53 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1342, col 6 to line 1342, col 26 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1342, col 31 to line 1342, col 53 of module Tarjan: 14314
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 1342, col 58 to line 1342, col 67 of module Tarjan: 10525
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |line 1343, col 6 to line 1343, col 82 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 1343, col 35 to line 1343, col 82 of module Tarjan: 369847
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1343, col 35 to line 1343, col 59 of module Tarjan: 369847
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 1343, col 35 to line 1343, col 37 of module Tarjan: 369847
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||||line 1343, col 42 to line 1343, col 59 of module Tarjan: 111155
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  |||line 1343, col 64 to line 1343, col 82 of module Tarjan: 355998
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2221:0 @!@!@
+  ||line 1343, col 15 to line 1343, col 31 of module Tarjan: 188646
+@!@!@ENDMSG 2221 @!@!@
+@!@!@STARTMSG 2202:0 @!@!@
+End of statistics.
+@!@!@ENDMSG 2202 @!@!@
+@!@!@STARTMSG 2200:0 @!@!@
+Progress(74) at 2020-04-23 15:33:09: 434,526 states generated (571,131 s/min), 188,646 distinct states found (247,951 ds/min), 0 states left on queue.
+@!@!@ENDMSG 2200 @!@!@
+@!@!@STARTMSG 2199:0 @!@!@
+434526 states generated, 188646 distinct states found, 0 states left on queue.
+@!@!@ENDMSG 2199 @!@!@
+@!@!@STARTMSG 2194:0 @!@!@
+The depth of the complete state graph search is 74.
+@!@!@ENDMSG 2194 @!@!@
+@!@!@STARTMSG 2268:0 @!@!@
+The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 10 and the 95th percentile is 3).
+@!@!@ENDMSG 2268 @!@!@
+@!@!@STARTMSG 2186:0 @!@!@
+Finished in 45670ms at (2020-04-23 15:33:09)
+@!@!@ENDMSG 2186 @!@!@
