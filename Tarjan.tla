@@ -755,30 +755,16 @@ THEOREM NumStack == Spec => []NumStackInv
             
             <5>b. CASE ~(num[n] \in Nat)  
                 <6>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
-                <6>1. onStack'[n] = onStack[n]
-                    <7>1. ~onStack[n] => ~(\E i \in 1 .. k : t_stack[i] = n)
-                        BY <2>5 DEF check_root
-                    <7>2. onStack' = [nn \in Nodes |-> IF \E i \in 1 .. k : nn = t_stack[i] THEN FALSE
-                                                  ELSE onStack[nn]]
-                          BY <2>5, <4>1, Zenon DEF check_root                      
-                    <7> QED BY <2>5, <4>1, <5>b, <7>1, <7>2 DEF check_root
+                <6>1. ~ onStack'[n]
+                  <7>1. onStack' = [nn \in Nodes |-> IF \E i \in 1 .. k : nn = t_stack[i] THEN FALSE
+                                                     ELSE onStack[nn]]
+                    BY <2>5, <4>1, Zenon DEF check_root
+                  <7>. QED  BY <5>b, <7>1
                 <6>2. ~(n \in UNION sccs')
                     <7>1. sccs' = (sccs \cup {{t_stack[i] : i \in 1 .. k}})
-                        BY <2>5, <4>1, Zenon DEF check_root                
-                    <7>2. ~onStack[n] => ~(\E i \in 1 .. k : t_stack[i] = n)
-                        BY <2>5 DEF check_root
-                    <7>3. ~(\E i \in 1 .. k : t_stack[i] = n) => ~(n \in {t_stack[i] : i \in 1 .. k})
-                        <8>1. ~(\E i \in 1 .. k : t_stack[i] = n) 
-                            BY <7>2, <5>b, <2>5 DEF check_root
-                        <8>2. ~(n \in {t_stack[i] : i \in 1 .. k})
-                            BY <5>b, <4>1, <8>1, <2>5, <7>1 DEF check_root
-                        <8> QED BY <8>1, <8>2, Zenon
-                    <7>4. ~(num[n] \in Nat) 
-                        BY <5>b, <2>5 DEF check_root 
-                    <7>5. ~(n \in UNION sccs)   
-                        BY <5>b, <7>4
-                    <7> QED BY <2>5, <4>1, <5>b, <7>1, <7>2, <7>3, <7>4 DEF check_root
-                <6> QED BY <2>5, <4>1, <5>b, <6>1, <6>2 DEF check_root    
+                        BY <2>5, <4>1, Zenon DEF check_root
+                    <7>. QED  BY <5>b, <7>1
+                <6> QED BY <4>1, <5>b, <6>1, <6>2
                                     
             <5> QED  BY <5>a, <5>b
             
@@ -886,7 +872,19 @@ THEOREM Color == Spec => []ColorInv
   <2>2. CASE explore_succ
     BY <2>2 DEF explore_succ
   <2>3. CASE visit_recurse
-    BY <2>3 DEF visit_recurse, StackEntry
+    <3>1. (White \subseteq toVisit \cup (IF pc = "start_visit" THEN {v} ELSE {}))'
+      BY <2>3 DEF visit_recurse
+    <3>2. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
+           => White \cap Succs[v] \subseteq succs \cup (IF pc = "visit_recurse" THEN {w} ELSE {}))'
+      BY <2>3 DEF visit_recurse
+    <3>3. (\A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
+                White \cap Succs[stack[i].v] 
+                \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
+      BY <2>3 DEF visit_recurse
+    <3>4. (\A n \in Black : Succs[n] \cap White = {})'
+      BY <2>3 DEF visit_recurse
+    <3>5. QED
+      BY <3>1, <3>2, <3>3, <3>4 DEF ColorInv
   <2>4. CASE continue_visit
     BY <2>4 DEF continue_visit
   <2>5. CASE check_root
