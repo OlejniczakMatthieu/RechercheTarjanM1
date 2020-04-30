@@ -868,7 +868,7 @@ THEOREM Color == Spec => []ColorInv
                PROVE  ColorInv'
     OBVIOUS
   <2>1. CASE start_visit
-    BY <2>1 DEF start_visit
+    BY <2>1, SMTT(20) DEF start_visit
   <2>2. CASE explore_succ
     BY <2>2 DEF explore_succ
   <2>3. CASE visit_recurse
@@ -880,9 +880,9 @@ THEOREM Color == Spec => []ColorInv
     <3>3. (\A i \in 1 .. Len(stack) : stack[i].pc = "continue_visit" =>
                 White \cap Succs[stack[i].v] 
                 \subseteq stack[i].succs \cup (IF pc = "start_visit" /\ v = stack[i].w THEN {v} ELSE {}))'
-      BY <2>3 DEF visit_recurse
+      BY <2>3, SMTT(20) DEF visit_recurse
     <3>4. (\A n \in Black : Succs[n] \cap White = {})'
-      BY <2>3 DEF visit_recurse
+      BY <2>3, SMTT(20) DEF visit_recurse
     <3>5. QED
       BY <3>1, <3>2, <3>3, <3>4 DEF ColorInv
   <2>4. CASE continue_visit
@@ -1128,8 +1128,9 @@ THEOREM Stacks == Spec => []Inv
         BY <4>1, <4>2
     <3>a. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
       BY <2>3 DEF visit_recurse
-    <3>b. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
-      BY <2>3 DEF visit_recurse
+    <3>b. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
+      => (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v]))'
+      BY <2>3, Zenon DEF visit_recurse
     <3>4. (\A i \in 1 .. Len(stack) : v # stack[i].v)'
       <4>1. \A i \in 2 .. Len(stack) : v # stack[i].v
         BY <2>3 DEF visit_recurse
@@ -1254,7 +1255,13 @@ THEOREM Stacks == Spec => []Inv
       <4>b. i \in 1 .. Len(stack)-1 => i \in 1 .. Len(stack)
         BY <2>5, <4>a DEF check_root
       <4>1. CASE lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
-        
+      \* Prouver que si il existe un ii,jj tq t_stack[ii] = stack[i].v et t_stack[jj] = t_stack[j].v
+      \* alors ii et jj \in k+1 ..  Len(t_stack)
+        <5>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
+        <5>. k \in 1 .. Len(t_stack) /\ t_stack[k] = v
+          BY <4>1
+        <5>1.  t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
+        <5>. QED BY <5>1, <4>a, <4>b, <4>1, <2>5 DEF check_root
       <4>2. CASE ~(lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v))
         <5>1. UNCHANGED t_stack
             BY <2>5, <4>2, Zenon DEF check_root
@@ -1264,9 +1271,9 @@ THEOREM Stacks == Spec => []Inv
       
     <3>7. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack))'
-      BY <2>5 DEF check_root
+(*****) BY <2>5 DEF check_root
     <3>8. (\A i \in 1 .. Len(stack)-1 : lowlink[stack[i].v] <= num[stack[i].v])'
-      BY <2>5 DEF check_root
+        BY <2>5, HeadTailProperties DEF check_root
     <3>9. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => onStack[v] /\ lowlink[v] <= num[v])'
       <4>1. CASE lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
@@ -1274,11 +1281,15 @@ THEOREM Stacks == Spec => []Inv
         <5>. k \in 1 .. Len(t_stack)
             BY <2>5 DEF check_root
         <5>1. UNCHANGED <<num, lowlink>>
-        <5> QED BY <2>5, <4>1, <5>1, HeadTailProperties DEF check_root
+(*****) <5> QED BY <2>5, <4>1, <5>1, HeadTailProperties DEF check_root
       <4>2. CASE ~(lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v))
         <5>1. UNCHANGED <<onStack, num, lowlink>>
             BY <2>5, <4>2 DEF check_root
-        <5> QED BY <2>5, <4>2, <5>1, HeadTailProperties DEF check_root, StackEntry
+        <5>2. onStack[Head(stack).v]
+            <6>1. \E i \in 1 .. Len(t_stack) : t_stack[i] = Head(stack).v
+              BY <2>5 DEF check_root, Precedes
+            <6> QED BY <2>5, <4>2, HeadTailProperties, <6>1 DEF check_root
+(*****) <5> QED BY <2>5, <4>2, <5>1, <5>2 DEF check_root, StackEntry
       <4> QED BY <2>5, <4>1, <4>2 DEF check_root
     <3>10. (\A i \in 1 .. Len(t_stack) : lowlink[t_stack[i]] <= num[t_stack[i]])'
       <4> SUFFICES ASSUME NEW i \in (1 .. Len(t_stack))'
@@ -1292,7 +1303,7 @@ THEOREM Stacks == Spec => []Inv
             BY <2>5, <4>1, Zenon DEF check_root
         <5>2. i \in k+1 .. Len(t_stack) => i \in 1 .. Len(t_stack') 
             BY <2>5, <4>1 DEF check_root
-        <5> QED BY <4>1, <2>5, <5>2, <5>1 DEF check_root
+        <5> QED BY <4>1, <2>5, <5>2, <5>1, SMTT(20) DEF check_root
       <4>2. CASE ~(lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v))
         <5>1. UNCHANGED <<t_stack, num, lowlink>>
             BY <2>5, <4>2, Zenon DEF check_root
@@ -1320,7 +1331,7 @@ THEOREM Stacks == Spec => []Inv
               /\ stack[i].v = stack[j].v => i = j)'
         BY <3>a, <3>b, <2>6 DEF main
     <3>x. (\A i \in 1 .. Len(stack)-1 : num[stack[i].v] < index)'
-        BY <2>6 DEF main
+        BY <2>6, <3>a, <3>b DEF main
     <3>y. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : num[stack[i].v] < num[v])'
        BY <2>6 DEF main
