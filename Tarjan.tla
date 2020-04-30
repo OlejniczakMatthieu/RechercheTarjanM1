@@ -1247,27 +1247,62 @@ THEOREM Stacks == Spec => []Inv
       <4>. QED  BY <4>1, <4>2
     <3>6. (\A i,j \in 1 .. Len(stack)-1 : i <= j => Precedes(stack[i].v, stack[j].v, t_stack))'
       <4> SUFFICES ASSUME NEW i \in (1 .. Len(stack)-1)', NEW j \in (1 .. Len(stack)-1)',
-                          (i <= j)'
+                          i <= j
                    PROVE  Precedes(stack[i].v, stack[j].v, t_stack)'
         OBVIOUS
-      <4>a. stack' = Tail(stack)
+      <4>1. stack' = Tail(stack)
         BY <2>5 DEF check_root
-      <4>b. i \in 1 .. Len(stack)-1 => i \in 1 .. Len(stack)
-        BY <2>5, <4>a DEF check_root
-      <4>1. CASE lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
-      \* Prouver que si il existe un ii,jj tq t_stack[ii] = stack[i].v et t_stack[jj] = t_stack[j].v
-      \* alors ii et jj \in k+1 ..  Len(t_stack)
-        <5>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
-        <5>. k \in 1 .. Len(t_stack) /\ t_stack[k] = v
+      <4>2. CASE lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v)
+        <5>1. /\ stack'[i].v = stack[i+1].v
+              /\ i+1 \in 1 .. Len(stack)-1
           BY <4>1
-        <5>1.  t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
-        <5>. QED BY <5>1, <4>a, <4>b, <4>1, <2>5 DEF check_root
-      <4>2. CASE ~(lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v))
-        <5>1. UNCHANGED t_stack
+        <5>2. /\ stack'[j].v = stack[j+1].v
+              /\ j+1 \in 1 .. Len(stack)-1
+          BY <4>1
+        <5>3. stack'[i].v \in Range(t_stack')
+          <6>1. pc' # "start_visit"
+            BY <2>5 DEF check_root
+          <6>2. stack'[i].v \in Nodes
+            BY <5>1
+          <6>. QED  BY <3>5, <6>1, <6>2 DEF Gray
+        <5>4. stack'[j].v \in Range(t_stack')
+          <6>1. pc' # "start_visit"
+            BY <2>5 DEF check_root
+          <6>2. stack'[j].v \in Nodes
+            BY <5>2
+          <6>. QED  BY <3>5, <6>1, <6>2 DEF Gray
+        <5>5. ASSUME NEW x \in Range(t_stack'), NEW y \in Range(t_stack')
+              PROVE  Precedes(x,y,t_stack') <=> Precedes(x,y,t_stack)
+          <6>. DEFINE k == CHOOSE k \in 1 .. Len(t_stack) : t_stack[k] = v
+          <6>. k \in 1 .. Len(t_stack) /\ t_stack[k] = v
+            BY <4>2
+          <6>1.  t_stack' = SubSeq(t_stack, k+1, Len(t_stack))
             BY <2>5, <4>2, Zenon DEF check_root
-        <5> QED BY <2>5,<4>2, <4>a, <4>b, <5>1, HeadTailProperties DEF check_root
+          <6>. HIDE DEF k
+          <6>2. PICK l \in 1 .. Len(t_stack') : t_stack'[l] = x
+            BY <6>1, DOMAIN t_stack' = 1 .. Len(t_stack'), Zenon DEF Range
+          <6>3. PICK m \in 1 .. Len(t_stack') : t_stack'[m] = y
+            BY <6>1, DOMAIN t_stack' = 1 .. Len(t_stack'), Zenon DEF Range
+          <6>4. l+k \in 1 .. Len(t_stack) /\ t_stack[l+k] = x
+            BY <6>1, <6>2
+          <6>5. m+k \in 1 .. Len(t_stack) /\ t_stack[m+k] = y
+            BY <6>1, <6>3
+          <6>6. \A p \in 1 .. Len(t_stack) : t_stack[p] = x => p = l+k
+            BY <6>4
+          <6>7. \A q \in 1 .. Len(t_stack) : t_stack[q] = y => q = m+k
+            BY <6>5
+          <6>8. \A p \in 1 .. Len(t_stack') : t_stack'[p] = x => p = l
+            BY <6>1, <6>4, <6>6
+          <6>9. \A q \in 1 .. Len(t_stack') : t_stack'[q] = y => q = m
+            BY <6>1, <6>5, <6>7
+          <6>. QED  BY <6>2, <6>3, <6>4, <6>5, <6>6, <6>7, <6>8, <6>9 DEF Precedes
+        <5>6. QED  BY <5>3, <5>4, <5>5, <5>1, <5>2
+      <4>3. CASE ~(lowlink[v] = num[v] /\ (\E k \in 1 .. Len(t_stack) : t_stack[k] = v))
+        <5>1. UNCHANGED t_stack
+            BY <2>5, <4>3, Zenon DEF check_root
+        <5> QED BY <2>5,<4>3, <4>1, <5>1, HeadTailProperties DEF check_root
       <4> QED
-        BY <2>5, <4>1, <4>2 DEF check_root
+        BY <2>5, <4>2, <4>3 DEF check_root
       
     <3>7. (pc \in {"explore_succ", "visit_recurse", "continue_visit", "check_root"}
            => \A i \in 1 .. Len(stack)-1 : Precedes(v, stack[i].v, t_stack))'
